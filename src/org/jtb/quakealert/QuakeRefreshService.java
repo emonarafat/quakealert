@@ -20,7 +20,7 @@ public class QuakeRefreshService extends IntentService {
 	static ArrayList<Quake> matchQuakes = new ArrayList<Quake>();
 
 	private void refresh() {
-		Log.d(getClass().getSimpleName(), "refreshing");
+		Log.d("quakealert", "refreshing");
 		try {
 			sendBroadcast(new Intent("showRefreshDialog"));
 			setLocation(this);
@@ -46,7 +46,7 @@ public class QuakeRefreshService extends IntentService {
 			}
 
 			int mqsSize = matchQuakes.size();
-			Log.d(getClass().getSimpleName(), "found " + mqsSize + " matches");
+			Log.d("quakealert", "found " + mqsSize + " matches");
 
 			for (int i = 0; i < mqsSize; i++) {
 				Quake q = matchQuakes.get(i);
@@ -62,7 +62,7 @@ public class QuakeRefreshService extends IntentService {
 
 			quakePrefs.setMatchIds(matchQuakes);
 			newIds.retainAll(quakePrefs.getMatchIds());
-			Log.d(getClass().getSimpleName(), newIds.size() + " new");
+			Log.d("quakealert", newIds.size() + " new");
 			quakePrefs.setNewIds(newIds);
 
 			sendBroadcast(new Intent("updateList"));
@@ -73,8 +73,7 @@ public class QuakeRefreshService extends IntentService {
 			}
 		} finally {
 			sendBroadcast(new Intent("dismissRefreshDialog"));
-			sendBroadcast(new Intent("release", null, this,
-					WakeLockReceiver.class));
+			Lock.release();
 		}
 	}
 
@@ -84,11 +83,10 @@ public class QuakeRefreshService extends IntentService {
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		Log.d(getClass().getSimpleName(), "received intent, action: "
+		Log.d("quakealert", "received intent, action: "
 				+ intent.getAction());
 
 		if (intent.getAction().equals("refresh")) {
-			//new Thread(new RefreshRunner(this)).start();
 			refresh();
 		}
 	}
@@ -98,12 +96,11 @@ public class QuakeRefreshService extends IntentService {
 				.getSystemService(Context.LOCATION_SERVICE);
 		String name = lm.getBestProvider(new Criteria(), true);
 		if (name == null) {
-			Log.e(QuakeRefreshService.class.getSimpleName(),
+			Log.e("quakealert",
 					"no best location provider returned");
 			location = null;
 			return;
 		}
-		// LocationProvider lp = lm.getProvider(name);
 		location = lm.getLastKnownLocation(name);
 	}
 

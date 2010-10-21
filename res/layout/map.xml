@@ -2,15 +2,15 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:id="@+id/mainlayout" android:orientation="vertical"
 	android:layout_width="fill_parent" android:layout_height="fill_parent">
-	<!-- debug key
+	<!--  debug key -->
 	<com.google.android.maps.MapView
 		android:id="@+id/map_view" android:layout_width="fill_parent"
 		android:layout_height="fill_parent" android:clickable="true"
-		android:apiKey="0K5NJoeJ_SeWpvO5nOpgeGK0NBngXra-HvlKLVg" />
-	-->
-	<!-- release key -->
+		android:apiKey="0K5NJoeJ_SeWlv8r308uEJDTqY11AwEu9xi2OeQ" />
+	<!-- release key
 	<com.google.android.maps.MapView
 		android:id="@+id/map_view" android:layout_width="fill_parent"
 		android:layout_height="fill_parent" android:clickable="true"
 		android:apiKey="0K5NJoeJ_SeXAmYI6Ch0zd37cnLWBlfIKix8-Dw" />
+	-->
 </RelativeLayout>

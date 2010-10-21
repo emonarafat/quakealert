@@ -132,7 +132,7 @@ public class QuakePrefs {
 	}
 
 	public float getMagnitude() {
-		return getFloat("magnitude", (float) 2.5);
+		return getFloat("magnitude", (float) 3.0);
 	}
 
 	public boolean isNotificationsEnabled() {
@@ -243,5 +243,9 @@ public class QuakePrefs {
 	
 	public boolean isZoomToFit() {
 		return getBoolean("zoomToFit", false);
+	}
+
+	public boolean isBootStart() {
+		return getBoolean("bootStart", false);
 	}
 }

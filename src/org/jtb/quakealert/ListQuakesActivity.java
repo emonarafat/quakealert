@@ -137,9 +137,9 @@ public class ListQuakesActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		boolean result = super.onCreateOptionsMenu(menu);
 		menu.add(0, REFRESH_MENU, 0, R.string.refresh_menu).setIcon(
-				R.drawable.refresh);
+				android.R.drawable.ic_menu_rotate);
 		menu.add(0, PREFS_MENU, 1, R.string.prefs_menu).setIcon(
-				R.drawable.prefs);
+				android.R.drawable.ic_menu_preferences);
 		return result;
 	}
 

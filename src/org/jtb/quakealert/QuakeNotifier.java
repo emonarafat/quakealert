@@ -32,7 +32,7 @@ public class QuakeNotifier {
 		NotificationManager nm = (NotificationManager) context
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
-		int icon = R.drawable.warning;
+		int icon = android.R.drawable.stat_sys_warning;
 		CharSequence tickerText = "Quake Alert!";
 		long when = System.currentTimeMillis();
 
