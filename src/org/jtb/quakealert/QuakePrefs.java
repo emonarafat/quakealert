@@ -114,7 +114,7 @@ public class QuakePrefs {
 		if (i != null) {
 			return i;
 		} 
-		Log.e(getClass().getSimpleName(), "invalid interval found: " + is);
+		Log.e("quakealert", "invalid interval found: " + is);
 		setInterval(Interval.HOUR);
 		return Interval.HOUR;
 	}

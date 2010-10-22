@@ -184,7 +184,7 @@ public class QuakeOverlay extends ItemizedOverlay {
 			canvas.drawCircle(point.x, point.y, dmgRadius, dvs.feelPaint);
 		}
 
-		// Log.d(getClass().getSimpleName(), "zoom: " + zoom);
+		// Log.d("quakealert", "zoom: " + zoom);
 		if (zoom >= 6) {
 			RectF rect = new RectF();
 			int rx1 = point.x + radius + PADDING * 2;

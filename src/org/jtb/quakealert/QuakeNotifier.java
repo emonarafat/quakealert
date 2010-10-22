@@ -28,7 +28,7 @@ public class QuakeNotifier {
 		if (size == 0) {
 			return;
 		}
-		
+
 		NotificationManager nm = (NotificationManager) context
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -47,14 +47,17 @@ public class QuakeNotifier {
 			notification.ledARGB = Color.parseColor("#ff0000");
 		}
 		if (quakePrefs.isNotificationVibrate()) {
-			notification.vibrate = new long[] { 100, 100, 100, 100, 100, 100, 100, 100 };
+			notification.vibrate = new long[] { 100, 100, 100, 100, 100, 100,
+					100, 100 };
 		}
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
-		notification.number = size;
-		
+		if (size > 1) {
+			notification.number = size;
+		}
+
 		CharSequence contentTitle = "Quake Alert!";
-		CharSequence contentText = size + " new M"
-				+ quakePrefs.getMagnitude() + "+ quakes";
+		CharSequence contentText = size + " new M" + quakePrefs.getMagnitude()
+				+ "+ quakes";
 		if (quakePrefs.getRange() > 0) {
 			Distance d = new Distance(quakePrefs.getRange());
 			contentText = contentText + " within " + d.toString(quakePrefs);
@@ -68,6 +71,6 @@ public class QuakeNotifier {
 		notification.setLatestEventInfo(context, contentTitle, contentText,
 				contentIntent);
 		nm.notify(ALERT_ID, notification);
-		Log.d(getClass().getSimpleName(), "notification sent, " + size + " new");
+		Log.d("quakealert", "notification sent, " + size + " new");
 	}
 }

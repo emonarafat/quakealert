@@ -39,10 +39,10 @@ public class Quakes {
             while ((line = reader.readLine()) != null) {
                 Quake quake = new Quake(line);
                 quakes.add(quake);
-                //Log.d(getClass().getSimpleName(), "read quake: " + quake);
+                //Log.d("quakealert", "read quake: " + quake);
             }
         } catch (Throwable t) {
-            Log.w(getClass().getSimpleName(), t);
+            Log.w("quakealert", t);
             quakes = null;
             return;
         } finally {

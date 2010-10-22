@@ -113,11 +113,11 @@ public class Quake {
 
 	private static Date parseDate(String s) {
 		try {
-			// Log.d(Quake.class.getSimpleName(), "s: + " + s);
+			// Log.d("quakealert", "s: + " + s);
 			Date d = DATE_FORMAT.parse(s);
-			// Log.d(Quake.class.getSimpleName(), "d: + " + getDateString(d));
+			// Log.d("quakealert", "d: + " + getDateString(d));
 			d = new Date(d.getTime() + ZONE_OFFSET + DST_OFFSET);
-			// Log.d(Quake.class.getSimpleName(), "d: + " + getDateString(d));
+			// Log.d("quakealert", "d: + " + getDateString(d));
 
 			return d;
 		} catch (ParseException pe) {
@@ -156,7 +156,7 @@ public class Quake {
 		}
 		if (range > 0) {
 			float distance = getDistance(location);
-			// Log.d(getClass().getSimpleName(), "range: " + range +
+			// Log.d("quakealert", "range: " + range +
 			// ", distance: "
 			// + distance);
 			if (distance > range) {

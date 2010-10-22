@@ -84,15 +84,13 @@ public class ListQuakesActivity extends Activity {
 			Uri defaultUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 			qp.setNotificationAlertSound(defaultUri);
 		}
-		
-		Log.d(getClass().getSimpleName(), "created");
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
 		unregisterReceiver(listUpdateReceiver);
-		Log.d(getClass().getSimpleName(), "paused");
+		Log.d("quakealert", "paused");
 	}
 
 	@Override
@@ -111,7 +109,7 @@ public class ListQuakesActivity extends Activity {
 		registerReceiver(listUpdateReceiver, new IntentFilter(
 				"showNetworkErrorDialog"));
 		
-		Log.d(getClass().getSimpleName(), "resumed");
+		Log.d("quakealert", "resumed");
 	}
 
 	public void updateList() {
@@ -125,11 +123,11 @@ public class ListQuakesActivity extends Activity {
 			mList.setAdapter(qa);
 			
 			new QuakePrefs(this).clearNewIds();
-			Log.d(getClass().getSimpleName(), "updated list (visible)");
+			Log.d("quakealert", "updated list (visible)");
 		} else {
 			mNoQuakesLayout.setVisibility(View.VISIBLE);
 			mList.setVisibility(View.GONE);
-			Log.d(getClass().getSimpleName(), "updated list (gone)");
+			Log.d("quakealert", "updated list (gone)");
 		}
 	}
 
@@ -217,7 +215,7 @@ public class ListQuakesActivity extends Activity {
 		try {
 			info = manager.getPackageInfo(getPackageName(), 0);
 		} catch (NameNotFoundException e) {
-			Log.e(getClass().getSimpleName(), "could not get version", e);
+			Log.e("quakealert", "could not get version", e);
 			return;
 		}
 
