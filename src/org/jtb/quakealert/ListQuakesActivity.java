@@ -36,6 +36,7 @@ public class ListQuakesActivity extends Activity {
 	private ProgressDialog mRefreshDialog;
 	private AlertDialog mLocationErrorDialog;
 	private AlertDialog mNetworkErrorDialog;
+	private AlertDialog mListClickDialog;
 
 	private ListView mList;
 	private LinearLayout mNoQuakesLayout;
@@ -57,10 +58,9 @@ public class ListQuakesActivity extends Activity {
 		mList.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View v,
 					int position, long id) {
-				Intent i = new Intent(mThis, QuakeMapActivity.class);
-				i.putExtra("org.jtb.quakealert.quake.position", new Integer(
-						position));
-				mThis.startActivity(i);
+				AlertDialog.Builder builder = new ListClickDialogBuilder(mThis, position);
+				mListClickDialog = builder.create();
+				mListClickDialog.show();
 			}
 		});
 

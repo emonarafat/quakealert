@@ -6,6 +6,7 @@
 	<string name="refresh_menu">Refresh</string>
 
 <string name="ok">Ok</string>
+<string name="cancel">Cancel</string>
 <string name="do_not_warn">Do not warn me again</string>
 <string name="service_warn">By default, Quake Alert! runs periodically to discover quake events and send notifications. You can disable notifications in Menu &gt; Preferences. When notifications are disabled, you will no longer receive quake notifications, and you must manually refresh to discover new quakes via Menu &gt; Refresh.</string>
 <string name="no_quakes_summary">No quakes.</string>

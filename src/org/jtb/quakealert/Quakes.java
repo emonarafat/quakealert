@@ -12,8 +12,8 @@ import java.util.List;
 import android.util.Log;
 
 public class Quakes {
-    //private static final String QUAKES_URL = "http://earthquake.usgs.gov/eqcenter/catalogs/eqs7day-M1.txt";
-    private static final String QUAKES_URL = "http://earthquake.usgs.gov/eqcenter/catalogs/eqs1day-M1.txt";
+    private static final String QUAKES_URL = "http://earthquake.usgs.gov/eqcenter/catalogs/eqs7day-M1.txt";
+    //private static final String QUAKES_URL = "http://earthquake.usgs.gov/eqcenter/catalogs/eqs1day-M1.txt";
     //private static final String QUAKES_URL = "http://192.168.0.100:8080/eqs1day-M1.txt";
     
 	private ArrayList<Quake> quakes = null;
@@ -25,10 +25,10 @@ public class Quakes {
         try {
             URL u = new URL(QUAKES_URL);
             HttpURLConnection uc = (HttpURLConnection) u.openConnection();
-            uc.setReadTimeout(30 * 1000); // 30 seconds
+            uc.setReadTimeout(60 * 1000); // 60 seconds
 
             if (uc.getResponseCode() != 200) {
-                //TODO: android log
+                Log.e("quakealert", "URL read failed, response code: " + uc.getResponseCode());
                 return;
             }
 
@@ -42,7 +42,7 @@ public class Quakes {
                 //Log.d("quakealert", "read quake: " + quake);
             }
         } catch (Throwable t) {
-            Log.w("quakealert", t);
+            Log.e("quakealert", "read failed", t);
             quakes = null;
             return;
         } finally {
@@ -51,7 +51,7 @@ public class Quakes {
                     reader.close();
                 }
             } catch (IOException ioe) {
-                // TODO: android log
+                Log.e("quakealert", "close failed", ioe);
             }
         }
     }

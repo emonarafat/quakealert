@@ -2,11 +2,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:id="@+id/mainlayout" android:orientation="vertical"
 	android:layout_width="fill_parent" android:layout_height="fill_parent">
-	<!--  debug key 
+	<!--  debug key, unbuntu
 	<com.google.android.maps.MapView
 		android:id="@+id/map_view" android:layout_width="fill_parent"
 		android:layout_height="fill_parent" android:clickable="true"
 		android:apiKey="0K5NJoeJ_SeWlv8r308uEJDTqY11AwEu9xi2OeQ" />
+	-->
+	<!--  debug key, mac
+	<com.google.android.maps.MapView
+		android:id="@+id/map_view" android:layout_width="fill_parent"
+		android:layout_height="fill_parent" android:clickable="true"
+		android:apiKey="0K5NJoeJ_SeXxErcvXGcXqHVGFTMlnjtk7G3TSg" />
 	-->
 	<!-- release key -->
 	<com.google.android.maps.MapView

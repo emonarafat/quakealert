@@ -34,7 +34,8 @@ public class QuakeMapActivity extends MapActivity {
 
 		Quake quake = QuakeRefreshService.matchQuakes.get(p);
 		mMapView.setBuiltInZoomControls(true);
-
+		mMapView.setSatellite(true);
+		
 		List<Overlay> mapOverlays = mMapView.getOverlays();
 		int size = QuakeRefreshService.matchQuakes.size();
 		for (int i = size - 1; i != -1; i--) {

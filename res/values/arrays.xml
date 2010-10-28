@@ -63,4 +63,8 @@
 		<item>Metric (Kilometers)</item>
 		<item>US (Miles)</item>
 	</string-array>
+	<string-array name="listclick_entries">
+		<item>Map</item>
+		<item>Details</item>
+	</string-array>
 </resources>

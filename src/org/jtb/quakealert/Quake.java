@@ -87,7 +87,7 @@ public class Quake {
 			nst = Integer.parseInt(m.group(9));
 			region = m.group(10);
 		} catch (NumberFormatException nfe) {
-			// TODO: android log
+			Log.e("quakalert", "error", nfe);
 			return;
 		}
 
@@ -224,5 +224,9 @@ public class Quake {
 	
 	public float getDepth() {
 		return depth;
+	}
+	
+	public String getSource() {
+		return source;
 	}
 }

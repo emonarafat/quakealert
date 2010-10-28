@@ -25,6 +25,7 @@ public class QuakeRefreshService extends IntentService {
 			sendBroadcast(new Intent("showRefreshDialog"));
 			setLocation(this);
 			if (location == null) {
+				Log.e("quakealert", "location unknown, aborting refresh");
 				sendBroadcast(new Intent("showLocationErrorDialog"));
 				return;
 			}
@@ -32,6 +33,7 @@ public class QuakeRefreshService extends IntentService {
 			quakes.update();
 			ArrayList<Quake> quakeList = quakes.get();
 			if (quakeList == null) {
+				Log.e("quakealert", "quake list empty (network error?), aborting refresh");
 				sendBroadcast(new Intent("showNetworkErrorDialog"));
 				return;
 			}
@@ -42,11 +44,12 @@ public class QuakeRefreshService extends IntentService {
 
 			matchQuakes = getQuakeMatches(this, quakeList);
 			if (matchQuakes == null) {
+				Log.d("quakealert", "no matches");
 				return;
 			}
 
 			int mqsSize = matchQuakes.size();
-			Log.d("quakealert", "found " + mqsSize + " matches");
+			Log.d("quakealert", mqsSize + " matches");
 
 			for (int i = 0; i < mqsSize; i++) {
 				Quake q = matchQuakes.get(i);
@@ -62,7 +65,7 @@ public class QuakeRefreshService extends IntentService {
 
 			quakePrefs.setMatchIds(matchQuakes);
 			newIds.retainAll(quakePrefs.getMatchIds());
-			Log.d("quakealert", newIds.size() + " new");
+			Log.d("quakealert", newIds.size() + " new matches");
 			quakePrefs.setNewIds(newIds);
 
 			sendBroadcast(new Intent("updateList"));

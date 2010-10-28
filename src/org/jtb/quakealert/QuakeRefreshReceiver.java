@@ -16,7 +16,6 @@ public class QuakeRefreshReceiver extends BroadcastReceiver {
 
 		if (intent.getAction().equals("refresh")) {
 			Lock.acquire(context);
-			context.sendBroadcast(new Intent("showRefreshDialog"));
 			context.startService(new Intent("refresh", null, context,
 					QuakeRefreshService.class));
 		} else if (intent.getAction().equals("schedule")) {
@@ -32,7 +31,7 @@ public class QuakeRefreshReceiver extends BroadcastReceiver {
 		Intent i = new Intent("refresh", null, context,
 				QuakeRefreshReceiver.class);
 		PendingIntent pi = PendingIntent.getBroadcast(context, 0, i,
-				PendingIntent.FLAG_CANCEL_CURRENT);
+				PendingIntent.FLAG_UPDATE_CURRENT);
 		mgr.cancel(pi);
 		QuakePrefs prefs = new QuakePrefs(context);
 		mgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
