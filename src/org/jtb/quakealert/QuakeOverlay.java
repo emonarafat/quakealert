@@ -21,7 +21,7 @@ import com.google.android.maps.OverlayItem;
 import com.google.android.maps.Projection;
 
 public class QuakeOverlay extends ItemizedOverlay {
-	private static final int TEXTSIZE = 12;
+	private static final int TEXTSIZE = 16;
 	private static final int TEXTLINES = 2;
 	private static final int PADDING = 2;
 

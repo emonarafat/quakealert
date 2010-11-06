@@ -68,7 +68,7 @@ public class Quake {
 	private int color = 0;
 	private GeoPoint geoPoint;
 
-	public Quake(String line) throws NumberFormatException {
+	public Quake(String line) throws NumberFormatException, ParseException {
 		// line = line.replace("  ", " ");
 		Matcher m = QUAKE_PATTERN.matcher(line);
 		if (!m.matches()) {
@@ -78,13 +78,15 @@ public class Quake {
 		source = m.group(1);
 		id = m.group(2);
 		version = m.group(3);
+		region = m.group(10);
+
 		date = parseDate(m.group(4));
+		
 		latitude = Double.parseDouble(m.group(5));
 		longitude = Double.parseDouble(m.group(6));
 		magnitude = Float.parseFloat(m.group(7));
 		depth = Float.parseFloat(m.group(8));
 		nst = Integer.parseInt(m.group(9));
-		region = m.group(10);
 		
 		latitudeE6 = (int) (latitude * Math.pow(10, 6));
 		longitudeE6 = (int) (longitude * Math.pow(10, 6));
@@ -106,7 +108,7 @@ public class Quake {
 		geoPoint = new GeoPoint(latitudeE6, longitudeE6);
 	}
 
-	private static Date parseDate(String s) {
+	private static Date parseDate(String s) throws ParseException {
 		try {
 			// Log.d("quakealert", "s: + " + s);
 			Date d = DATE_FORMAT.parse(s);
@@ -115,8 +117,9 @@ public class Quake {
 			// Log.d("quakealert", "d: + " + getDateString(d));
 
 			return d;
-		} catch (ParseException pe) {
-			return null;
+		} catch (ParseException e) {
+			Log.e("quakealert", "could not parse date from string: " + s);
+			throw e;
 		}
 	}
 
