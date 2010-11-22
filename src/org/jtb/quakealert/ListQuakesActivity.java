@@ -1,5 +1,8 @@
 package org.jtb.quakealert;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -14,6 +17,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,12 +33,11 @@ public class ListQuakesActivity extends Activity {
 	private static final int PREFS_REQUEST = 0;
 
 	static final int REFRESH_DIALOG = 0;
-	static final int LOCATION_ERROR_DIALOG = 1;
 	static final int NETWORK_ERROR_DIALOG = 2;
+	static final int WARN_DIALOG = 3;
 
 	private AlertDialog mServiceWarnDialog;
 	private ProgressDialog mRefreshDialog;
-	private AlertDialog mLocationErrorDialog;
 	private AlertDialog mNetworkErrorDialog;
 	private AlertDialog mListClickDialog;
 
@@ -42,6 +45,9 @@ public class ListQuakesActivity extends Activity {
 	private LinearLayout mNoQuakesLayout;
 	private ListReceiver listUpdateReceiver;
 	private ListQuakesActivity mThis;
+	private QuakePrefs quakePrefs;
+	private QuakeAdapter quakeAdapter;
+	private List<Quake> quakes = new ArrayList<Quake>();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -49,40 +55,40 @@ public class ListQuakesActivity extends Activity {
 		setContentView(R.layout.list);
 
 		mThis = this;
-		listUpdateReceiver = new ListReceiver(this);
-
+		quakePrefs = new QuakePrefs(this);
 		upgrade();
+		listUpdateReceiver = new ListReceiver(this);
+		quakeAdapter = new QuakeAdapter(this, quakes);
 
 		mNoQuakesLayout = (LinearLayout) findViewById(R.id.no_quakes_layout);
 		mList = (ListView) findViewById(R.id.list);
 		mList.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View v,
 					int position, long id) {
-				AlertDialog.Builder builder = new ListClickDialogBuilder(mThis, position);
+				AlertDialog.Builder builder = new ListClickDialogBuilder(mThis,
+						position);
 				mListClickDialog = builder.create();
 				mListClickDialog.show();
 			}
 		});
+		mList.setAdapter(quakeAdapter);
 
-		QuakePrefs qp = new QuakePrefs(this);
-		if (qp.isNotificationsEnabled()) {
+		if (quakePrefs.isNotificationsEnabled()) {
 			sendBroadcast(new Intent("schedule", null, this,
 					QuakeRefreshReceiver.class));
 		}
 		sendBroadcast(new Intent("refresh", null, this,
 				QuakeRefreshReceiver.class));
 
-		WarnDialog.Builder builder = new WarnDialog.Builder(this,
-				"serviceWarn", R.string.service_warn);
-		if (builder.isWarn()) {
-			mServiceWarnDialog = builder.create();
-			mServiceWarnDialog.show();
+		if (quakePrefs.isWarn("serviceWarn")) {
+			showDialog(WARN_DIALOG);
 		}
-		
-		Uri alertSoundUri = qp.getNotificationAlertSound();
+
+		Uri alertSoundUri = quakePrefs.getNotificationAlertSound();
 		if (alertSoundUri == null) {
-			Uri defaultUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-			qp.setNotificationAlertSound(defaultUri);
+			Uri defaultUri = RingtoneManager
+					.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+			quakePrefs.setNotificationAlertSound(defaultUri);
 		}
 	}
 
@@ -97,32 +103,35 @@ public class ListQuakesActivity extends Activity {
 	public void onResume() {
 		super.onResume();
 
-		updateList();
-
 		registerReceiver(listUpdateReceiver, new IntentFilter("updateList"));
 		registerReceiver(listUpdateReceiver, new IntentFilter(
 				"showRefreshDialog"));
 		registerReceiver(listUpdateReceiver, new IntentFilter(
 				"dismissRefreshDialog"));
 		registerReceiver(listUpdateReceiver, new IntentFilter(
-				"showLocationErrorDialog"));
+				"showUnknownLocationMessage"));
 		registerReceiver(listUpdateReceiver, new IntentFilter(
 				"showNetworkErrorDialog"));
-		
+
 		Log.d("quakealert", "resumed");
 	}
 
 	public void updateList() {
 		if (QuakeRefreshService.matchQuakes != null
 				&& QuakeRefreshService.matchQuakes.size() > 0) {
-			QuakeAdapter qa = new QuakeAdapter(this,
-					QuakeRefreshService.matchQuakes,
-					QuakeRefreshService.location);
+
+			quakePrefs.setLastUpdate();
+
+			quakes.clear();
+			quakes.addAll(QuakeRefreshService.matchQuakes);
+			quakeAdapter.setLocation(QuakeRefreshService.location);
+			quakeAdapter.notifyDataSetChanged();
+
 			mNoQuakesLayout.setVisibility(View.GONE);
 			mList.setVisibility(View.VISIBLE);
-			mList.setAdapter(qa);
-			
-			new QuakePrefs(this).clearNewIds();
+
+			new QuakeNotifier(this).cancel();
+
 			Log.d("quakealert", "updated list (visible)");
 		} else {
 			mNoQuakesLayout.setVisibility(View.VISIBLE);
@@ -174,37 +183,37 @@ public class ListQuakesActivity extends Activity {
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
 		case REFRESH_DIALOG:
-			mRefreshDialog = new ProgressDialog(this);
-			mRefreshDialog.setMessage("Refreshing, please wait.");
-			mRefreshDialog.setIndeterminate(true);
-			mRefreshDialog.setCancelable(false);
+			if (mRefreshDialog == null) {
+				mRefreshDialog = new ProgressDialog(this);
+				mRefreshDialog.setMessage("Refreshing, please wait.");
+				mRefreshDialog.setIndeterminate(true);
+				mRefreshDialog.setCancelable(false);
+			}
 			return mRefreshDialog;
-		case LOCATION_ERROR_DIALOG:
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle("Unknown Location");
-			builder
-					.setMessage("Ensure that you have at least one location source enabled in Settings > Security & location.");
-			builder.setNeutralButton(R.string.ok,
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							dismissDialog(LOCATION_ERROR_DIALOG);
-						}
-					});
-			mLocationErrorDialog = builder.create();
-			return mLocationErrorDialog;
 		case NETWORK_ERROR_DIALOG:
-			builder = new AlertDialog.Builder(this);
-			builder.setTitle("Network Error");
-			builder
-					.setMessage("Could not retrieve recent quakes. Ensure that you have a network connection (mobile or wifi).");
-			builder.setNeutralButton(R.string.ok,
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							dismissDialog(NETWORK_ERROR_DIALOG);
-						}
-					});
-			mNetworkErrorDialog = builder.create();
+			if (mNetworkErrorDialog == null) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle("Network Error");
+				builder.setMessage("Could not retrieve recent quakes. Ensure that you have a network connection (mobile or wifi).");
+				builder.setNeutralButton(R.string.ok,
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int which) {
+								dismissDialog(NETWORK_ERROR_DIALOG);
+							}
+						});
+				mNetworkErrorDialog = builder.create();
+			}
 			return mNetworkErrorDialog;
+		case WARN_DIALOG:
+			if (mServiceWarnDialog == null) {
+				AlertDialog.Builder builder = new WarnDialogBuilder(
+						new ContextThemeWrapper(this,
+								android.R.style.Theme_Dialog), "serviceWarn",
+						R.string.service_warn);
+				mServiceWarnDialog = builder.create();
+			}
+			return mServiceWarnDialog;
 		}
 		return null;
 	}
@@ -219,18 +228,17 @@ public class ListQuakesActivity extends Activity {
 			return;
 		}
 
-		QuakePrefs qp = new QuakePrefs(this);
-		if (!qp.isUpgradedTo(4)) {
+		if (!quakePrefs.isUpgradedTo(4)) {
 			// upgrade range from km to m
-			int km = qp.getRange();
+			int km = quakePrefs.getRange();
 			if (km > 0) {
-				qp.setRange(km * 1000);
+				quakePrefs.setRange(km * 1000);
 			}
 		}
-		if (!qp.isUpgradedTo(16)) {
+		if (!quakePrefs.isUpgradedTo(16)) {
 			// upgrade interval
 			Interval i = null;
-			long interval = qp.getLong("interval", 0);
+			long interval = quakePrefs.getLong("interval", 0);
 			if (interval < 60 * 60 * 1000) {
 				// was set to 5 or 10 mins
 				i = Interval.FIFTEEN_MINUTES;
@@ -238,17 +246,39 @@ public class ListQuakesActivity extends Activity {
 				// was set to 1 or 3 hours
 				i = Interval.HOUR;
 			}
-			qp.setInterval(i);
+			quakePrefs.setInterval(i);
 		}
-		if (!qp.isUpgradedTo(20)) {
+		if (!quakePrefs.isUpgradedTo(20)) {
 			// if using 100km range, set to 250km
 			// 100km is removed
-			int km = qp.getRange();
+			int km = quakePrefs.getRange();
 			if (km == 100) {
-				qp.setRange(250);
+				quakePrefs.setRange(250);
 			}
 		}
-		
-		qp.setUpgradedTo(info.versionCode);
+		if (!quakePrefs.isUpgradedTo(30)) {
+			// set old float magnitude value to constant
+			String m = quakePrefs.getString("magnitude", null);
+			if (m != null && m.contains(".")) {
+				float f = Float.parseFloat(m);
+				Magnitude mag = Magnitude.valueOf(f);
+				quakePrefs.setMagnitude(mag);
+			}
+
+			// set old string units value to constant
+			String u = quakePrefs.getString("units", null);
+			if (u != null && Character.isLowerCase(u.charAt(0))) {
+				Units units;
+				if (u.equals("metric")) {
+					units = Units.METRIC;
+				} else {
+					units = Units.US;
+				}
+				quakePrefs.setUnits(units);
+			}
+
+		}
+
+		quakePrefs.setUpgradedTo(info.versionCode);
 	}
 }

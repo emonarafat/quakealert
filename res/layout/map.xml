@@ -14,6 +14,12 @@
 		android:layout_height="fill_parent" android:clickable="true"
 		android:apiKey="0K5NJoeJ_SeXxErcvXGcXqHVGFTMlnjtk7G3TSg" />
 	-->
+	<!--  debug key, windows
+	<com.google.android.maps.MapView
+		android:id="@+id/map_view" android:layout_width="fill_parent"
+		android:layout_height="fill_parent" android:clickable="true"
+		android:apiKey="0K5NJoeJ_SeWrQX9rWPhRA8idYIcK6MRlQ1_JGQ" />
+	-->
 	<!-- release key -->
 	<com.google.android.maps.MapView
 		android:id="@+id/map_view" android:layout_width="fill_parent"

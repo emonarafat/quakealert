@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-	<ListPreference android:title="Range"
-		android:summary="Quakes within this range will be reported."
-		android:key="range" android:defaultValue="-1" android:entryValues="@array/range_values" />
-	<ListPreference android:title="Magnitude"
-		android:summary="Quakes with at least this magnitude will be reported."
-		android:key="magnitude" android:defaultValue="3.0"
-		android:entries="@array/magnitude_entries" android:entryValues="@array/magnitude_values" />
-	<ListPreference android:title="Units"
-		android:summary="Set units to use when displaying distances (US or metric)."
-		android:key="units" android:defaultValue="metric" android:entries="@array/units_entries"
-		android:entryValues="@array/units_values" />
-	<CheckBoxPreference android:title="Zoom to fit?"
-		android:summary="Zoom map to fit all listed quakes?" android:key="zoomToFit"
-		android:defaultValue="false" />
-	<CheckBoxPreference android:title="Send Notifications?"
-		android:summary="Send notifications when quakes occur that match your criteria."
-		android:key="notificationsEnabled" android:defaultValue="true" />
-	<PreferenceCategory android:title="Notification Details">
+	<PreferenceCategory android:title="Display">
+		<ListPreference android:title="Range"
+			android:summary="Quakes within this range will be reported."
+			android:key="range" android:defaultValue="-1" android:entryValues="@array/range_values" />
+		<ListPreference android:title="Magnitude"
+			android:summary="Quakes with at least this magnitude will be reported."
+			android:key="magnitude" android:defaultValue="M3"
+			android:entries="@array/magnitude_entries" android:entryValues="@array/magnitude_values" />
+		<ListPreference android:title="Units"
+			android:summary="Set units to use when displaying distances (US or metric)."
+			android:key="units" android:defaultValue="METRIC" android:entries="@array/units_entries"
+			android:entryValues="@array/units_values" />
+		<CheckBoxPreference android:title="Zoom to fit?"
+			android:summary="Zoom map to fit all listed quakes?" android:key="zoomToFit"
+			android:defaultValue="false" />
+	</PreferenceCategory>
+	<PreferenceCategory android:title="Notifications">
+		<CheckBoxPreference android:title="Send Notifications?"
+			android:summary="Send notifications when quakes occur that match your criteria."
+			android:key="notificationsEnabled" android:defaultValue="true" />
 		<CheckBoxPreference android:title="Start at Boot?"
 			android:summary="Start notification service automatically when phone boots?"
 			android:key="bootStart" android:defaultValue="false" />

@@ -5,17 +5,17 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.google.android.maps.GeoPoint;
 
 import android.graphics.Color;
 import android.location.Location;
 import android.util.Log;
 
+import com.google.android.maps.GeoPoint;
+
 public class Quake {
+	private static final String USGS_URL_PREFIX = "http://earthquake.usgs.gov/earthquakes/recenteqsus/Quakes/";
 	private static final Pattern QUAKE_PATTERN = Pattern
 			.compile("([^,]+),([^,]+),([^,]+),\"([^\"]+) UTC\",([^,]+),([^,]+),([^,]+),([^,]+),\\s?([^,]+),\"([^\"]+)\"");
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(
@@ -23,32 +23,14 @@ public class Quake {
 	private static final SimpleDateFormat SHORT_DATE_FORMAT = new SimpleDateFormat(
 			"EEE, h:mm a");
 	private static final SimpleDateFormat LIST_DATE_FORMAT = new SimpleDateFormat(
-			"EEEE, h:mm a");
+			"EEEE, MMM d, h:mm a");
 	private static final int ZONE_OFFSET = Calendar.getInstance().get(
 			Calendar.ZONE_OFFSET);
 	private static final int DST_OFFSET = Calendar.getInstance().get(
 			Calendar.DST_OFFSET);
 
 	static class ListComparator implements Comparator<Quake> {
-		private HashSet<String> newIds;
-
-		public ListComparator(HashSet<String> newIds) {
-			this.newIds = newIds;
-		}
-
 		public int compare(Quake q1, Quake q2) {
-			if (newIds != null && newIds.size() > 0) {
-				boolean q1New = newIds.contains(q1.getId());
-				boolean q2New = newIds.contains(q2.getId());
-
-				if (q2New && !q1New) {
-					return 1;
-				}
-				if (q1New && !q2New) {
-					return -1;
-				}
-			}
-
 			return q2.getDate().compareTo(q1.getDate());
 		}
 	}
@@ -67,8 +49,10 @@ public class Quake {
 	private String region;
 	private int color = 0;
 	private GeoPoint geoPoint;
+	private boolean newQuake = false;
 
-	public Quake(String line) throws NumberFormatException, ParseException {
+	public Quake(String line, long lastUpdate) throws NumberFormatException,
+			ParseException {
 		// line = line.replace("  ", " ");
 		Matcher m = QUAKE_PATTERN.matcher(line);
 		if (!m.matches()) {
@@ -81,13 +65,13 @@ public class Quake {
 		region = m.group(10);
 
 		date = parseDate(m.group(4));
-		
+
 		latitude = Double.parseDouble(m.group(5));
 		longitude = Double.parseDouble(m.group(6));
 		magnitude = Float.parseFloat(m.group(7));
 		depth = Float.parseFloat(m.group(8));
 		nst = Integer.parseInt(m.group(9));
-		
+
 		latitudeE6 = (int) (latitude * Math.pow(10, 6));
 		longitudeE6 = (int) (longitude * Math.pow(10, 6));
 
@@ -106,6 +90,10 @@ public class Quake {
 		}
 
 		geoPoint = new GeoPoint(latitudeE6, longitudeE6);
+
+		if (date.getTime() > lastUpdate) {
+			newQuake = true;
+		}
 	}
 
 	private static Date parseDate(String s) throws ParseException {
@@ -166,6 +154,9 @@ public class Quake {
 	}
 
 	public float getDistance(Location location) {
+		if (location == null) {
+			return -1;
+		}
 		Location quakeLocation = new Location(location);
 		quakeLocation.setLatitude(latitude);
 		quakeLocation.setLongitude(longitude);
@@ -226,5 +217,14 @@ public class Quake {
 
 	public String getSource() {
 		return source;
+	}
+
+	public boolean isNewQuake() {
+		return newQuake;
+	}
+
+	public String getDetailUrl() {
+		String u = USGS_URL_PREFIX + source + id + ".php";
+		return u;
 	}
 }

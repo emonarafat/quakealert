@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:orientation="vertical" android:layout_width="fill_parent"
-	android:layout_height="fill_parent" android:paddingLeft="16px"
-	android:paddingRight="16px">
-	<TextView android:textSize="16px" android:id="@+id/warn_text"
+	android:layout_height="fill_parent" android:paddingLeft="16dp"
+	android:paddingRight="16dp">
+	<TextView android:textSize="16dp" android:id="@+id/warn_text" android:textColor="@android:color/white"
 		android:text="Some warning message. Do you know that the quick brown fox jumped over the lazy dogs?"
-		android:layout_width="fill_parent" android:layout_height="wrap_content" android:paddingBottom="32px"/>
-	<CheckBox android:id="@+id/warn_check"
-	android:text="Do not warn me again"
-		android:layout_width="fill_parent" android:layout_height="wrap_content"/>
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:paddingBottom="32dp" />
+	<CheckBox android:id="@+id/warn_check" android:text="Do not warn me again"  android:textColor="@android:color/white"
+		android:layout_width="fill_parent" android:layout_height="wrap_content" />
 </LinearLayout>

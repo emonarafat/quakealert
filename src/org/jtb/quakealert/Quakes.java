@@ -6,21 +6,18 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import android.util.Log;
 
 public class Quakes {
 	private static final String QUAKES_URL = "http://earthquake.usgs.gov/eqcenter/catalogs/eqs7day-M1.txt";
-	// private static final String QUAKES_URL =
-	// "http://earthquake.usgs.gov/eqcenter/catalogs/eqs1day-M1.txt";
+	//private static final String QUAKES_URL = "http://earthquake.usgs.gov/eqcenter/catalogs/eqs1day-M1.txt";
 	// private static final String QUAKES_URL =
 	// "http://192.168.0.100:8080/eqs1day-M1.txt";
 
 	private ArrayList<Quake> quakes = null;
 
-	public synchronized void update() {
+	public synchronized void update(long lastUpdate) {
 		BufferedReader reader = null;
 		String line;
 
@@ -43,7 +40,7 @@ public class Quakes {
 			quakes = new ArrayList<Quake>();
 			while ((line = reader.readLine()) != null) {
 				try {
-					Quake quake = new Quake(line);
+					Quake quake = new Quake(line, lastUpdate);
 					quakes.add(quake);
 				} catch (Exception e) {
 					Log.e("quakalert",
@@ -67,9 +64,6 @@ public class Quakes {
 	}
 
 	public synchronized ArrayList<Quake> get() {
-		if (quakes == null) {
-			update();
-		}
 		return quakes;
 	}
 }

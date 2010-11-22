@@ -4,8 +4,6 @@ import java.util.List;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
-
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;

@@ -9,8 +9,7 @@ import android.content.Intent;
 public class NotificationClickReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		QuakePrefs qp = new QuakePrefs(context);
-		Collections.sort(QuakeRefreshService.matchQuakes, new Quake.ListComparator(null));
+		Collections.sort(QuakeRefreshService.matchQuakes, new Quake.ListComparator());
 	
 		Intent listIntent = new Intent(context, ListQuakesActivity.class);
 		listIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);

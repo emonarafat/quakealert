@@ -1,8 +1,5 @@
 package org.jtb.quakealert;
 
-import java.util.Date;
-import java.util.HashSet;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -22,13 +19,13 @@ public class QuakeNotifier {
 		quakePrefs = new QuakePrefs(context);
 	}
 
-	public void alert() {
-		HashSet<String> newIds = quakePrefs.getNewIds();
-		int size = newIds.size();
-		if (size == 0) {
-			return;
-		}
+	public void cancel() {
+		NotificationManager nm = (NotificationManager) context
+				.getSystemService(Context.NOTIFICATION_SERVICE);
+		nm.cancel(ALERT_ID);
+	}
 
+	public void alert() {
 		NotificationManager nm = (NotificationManager) context
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -51,14 +48,14 @@ public class QuakeNotifier {
 					100, 100 };
 		}
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
-		if (size > 1) {
-			notification.number = size;
+		if (QuakeRefreshService.newCount > 1) {
+			notification.number = QuakeRefreshService.newCount;
 		}
 
 		CharSequence contentTitle = "Quake Alert!";
-		CharSequence contentText = size + " new M" + quakePrefs.getMagnitude()
-				+ "+ quakes";
-		if (quakePrefs.getRange() > 0) {
+		CharSequence contentText = QuakeRefreshService.newCount + " new "
+				+ quakePrefs.getMagnitude().getTitle(context) + " quakes";
+		if (quakePrefs.getRange() != -1) {
 			Distance d = new Distance(quakePrefs.getRange());
 			contentText = contentText + " within " + d.toString(quakePrefs);
 		}
@@ -71,6 +68,7 @@ public class QuakeNotifier {
 		notification.setLatestEventInfo(context, contentTitle, contentText,
 				contentIntent);
 		nm.notify(ALERT_ID, notification);
-		Log.d("quakealert", "notification sent, " + size + " new");
+		Log.d("quakealert", "notification sent, "
+				+ QuakeRefreshService.newCount + " new");
 	}
 }

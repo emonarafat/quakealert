@@ -1,6 +1,5 @@
 package org.jtb.quakealert;
 
-import java.util.HashSet;
 import java.util.List;
 
 import android.app.Activity;
@@ -12,42 +11,57 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class QuakeAdapter extends ArrayAdapter {
-	private Activity context;
+public class QuakeAdapter extends ArrayAdapter<Quake> {
 	private List<Quake> quakes;
 	private Location location;
 	private QuakePrefs quakePrefs;
-	private HashSet<String> newIds;
 	private LayoutInflater inflater;
-	
-	QuakeAdapter(Activity context, List<Quake> quakes, Location location) {
-		super(context, R.layout.quake, quakes);
 
-		this.context = context;
+	QuakeAdapter(Activity context, List<Quake> quakes) {
+		super(context, R.layout.quake, quakes);
 		this.quakes = quakes;
-		this.location = location;
-		
+
 		quakePrefs = new QuakePrefs(context);
-		newIds = quakePrefs.getNewIds();
 		this.inflater = context.getLayoutInflater();
 	}
 
 	public View getView(int position, View convertView, ViewGroup parent) {
-		View view = inflater.inflate(R.layout.quake, null);
+		View view;
+		if (convertView != null) {
+			view = convertView;
+		} else {
+			view = inflater.inflate(R.layout.quake, null);
+		}
+
 		Quake q = quakes.get(position);
-	
+
 		View severityView = view.findViewById(R.id.severity);
 		severityView.setBackgroundColor(q.getColor());
-		
+
 		TextView row1Text = (TextView) view.findViewById(R.id.row1_text);
 		row1Text.setText("M" + q.getMagnitude() + " - " + q.getRegion());
-		if (newIds.contains(q.getId())) {
+		if (q.isNewQuake()) {
 			row1Text.setTypeface(Typeface.DEFAULT_BOLD);
+		} else {
+			row1Text.setTypeface(Typeface.DEFAULT);
 		}
-		Distance d = new Distance(q.getDistance(location));	
+
 		TextView row2Text = (TextView) view.findViewById(R.id.row2_text);
-		row2Text.setText(q.getListDateString() + ", " + d.toString(quakePrefs));
-		
+		String row2 = q.getListDateString();
+		if (quakePrefs.getRange() != -1) {
+			Distance d = new Distance(q.getDistance(location));
+			row2 += ", " + d.toString(quakePrefs);
+		}
+		row2Text.setText(row2);
+
 		return view;
-	}	
+	}
+
+	public List<Quake> getQuakes() {
+		return quakes;
+	}
+
+	public void setLocation(Location location) {
+		this.location = location;
+	}
 }

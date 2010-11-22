@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string-array name="magnitude_values">
-		<item>1.0</item>
-		<item>3.0</item>
-		<item>4.0</item>
-		<item>5.0</item>
-		<item>6.0</item>
-		<item>7.0</item>
-		<item>8.0</item>
-		<item>9.0</item>
+		<item>M1</item>
+		<item>M3</item>
+		<item>M4</item>
+		<item>M5</item>
+		<item>M6</item>
+		<item>M7</item>
+		<item>M8</item>
+		<item>M9</item>
 	</string-array>
 	<string-array name="magnitude_entries">
 		<item>M1.0+ (micro)</item>
@@ -35,10 +35,10 @@
 		<item>Show All</item>
 	</string-array>
 	<string-array name="range_us_entries">
-		<item>60 miles</item>
-		<item>150 miles</item>
-		<item>300 miles</item>
-		<item>600 miles</item>
+		<item>~60 miles</item>
+		<item>~150 miles</item>
+		<item>~300 miles</item>
+		<item>~600 miles</item>
 		<item>Show All</item>
 	</string-array>
 	<string-array name="interval_values">
@@ -56,8 +56,8 @@
 		<item>1 day</item>
 	</string-array>
 	<string-array name="units_values">
-		<item>metric</item>
-		<item>us</item>
+		<item>METRIC</item>
+		<item>US</item>
 	</string-array>
 	<string-array name="units_entries">
 		<item>Metric (Kilometers)</item>

@@ -1,11 +1,5 @@
 package org.jtb.quakealert;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.StringTokenizer;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -20,7 +14,7 @@ public class QuakePrefs {
 		this.context = context;
 	}
 
-	private String getString(String key, String def) {
+	public String getString(String key, String def) {
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(context);
 		String s = prefs.getString(key, def);
@@ -32,13 +26,6 @@ public class QuakePrefs {
 				.getDefaultSharedPreferences(context);
 		int i = Integer.parseInt(prefs.getString(key, Integer.toString(def)));
 		return i;
-	}
-
-	private float getFloat(String key, float def) {
-		SharedPreferences prefs = PreferenceManager
-				.getDefaultSharedPreferences(context);
-		float f = Float.parseFloat(prefs.getString(key, Float.toString(def)));
-		return f;
 	}
 
 	public long getLong(String key, long def) {
@@ -131,20 +118,26 @@ public class QuakePrefs {
 		setInt("range", meters);
 	}
 
-	public float getMagnitude() {
-		return getFloat("magnitude", (float) 3.0);
+	public Magnitude getMagnitude() {
+		String m = getString("magnitude", Magnitude.M3.toString());
+		return Magnitude.valueOf(m);
+	}
+
+	public void setMagnitude(Magnitude mag) {
+		setString("magnitude", mag.toString());
 	}
 
 	public boolean isNotificationsEnabled() {
 		return getBoolean("notificationsEnabled", true);
 	}
 
-	public String getUnits() {
-		return getString("units", "metric");
+	public Units getUnits() {
+		String u = getString("units", "METRIC");
+		return Units.valueOf(u);
 	}
 
-	public void setUnits(String units) {
-		setString("units", units);
+	public void setUnits(Units units) {
+		setString("units", units.toString());
 	}
 
 	public boolean isUpgradedTo(int version) {
@@ -159,74 +152,6 @@ public class QuakePrefs {
 		setInt("upgradedTo", version);
 	}
 
-	public HashSet<String> getMatchIds() {
-		String idsString = getString("matchIds", null);
-		HashSet<String> ids = split(idsString, ',');
-		return ids;
-	}
-
-	public void setMatchIds(List<Quake> quakeList) {
-		setString("matchIds", toIdsString(quakeList));
-	}
-
-	public HashSet<String> getNewIds() {
-		String idsString = getString("newIds", null);
-		HashSet<String> ids = split(idsString, ',');
-		return ids;
-	}
-
-	public void setNewIds(List<Quake> quakeList) {
-		setString("newIds", toIdsString(quakeList));
-	}
-
-	public void setNewIds(HashSet<String> ids) {
-		setString("newIds", toIdsString(ids));
-	}
-
-	public void clearNewIds() {
-		setString("newIds", "");
-	}
-
-	private static String toIdsString(List<Quake> quakeList) {
-		StringBuffer b = new StringBuffer();
-		if (quakeList != null) {
-			int quakeListSize = quakeList.size();
-			for (int i = 0; i < quakeListSize; i++) {
-				b.append(quakeList.get(i).getId());
-				if (i < quakeListSize-1) {
-					b.append(',');
-				}
-			}
-		}
-		return b.toString();
-	}
-
-	private static String toIdsString(HashSet<String> ids) {
-		StringBuffer b = new StringBuffer();
-		if (ids != null) {
-			for (Iterator<String> i = ids.iterator(); i.hasNext();) {
-				b.append(i.next());
-				if (i.hasNext()) {
-					b.append(',');
-				}
-			}
-		}
-		return b.toString();
-	}
-	
-	private static HashSet<String> split(String s, char c) {
-		HashSet<String> tokens = new HashSet<String>();
-		if (s == null || s.length() == 0) {
-			return tokens;
-		}
-		StringTokenizer st = new StringTokenizer(s, ",");
-		while (st.hasMoreTokens()) {
-			tokens.add(st.nextToken());
-		}
-
-		return tokens;
-	}
-	
 	public Uri getNotificationAlertSound() {
 		String s = getString("notificationAlertSound", "");
 		if (s == null || s.length() == 0) {
@@ -247,5 +172,13 @@ public class QuakePrefs {
 
 	public boolean isBootStart() {
 		return getBoolean("bootStart", false);
+	}
+	
+	public long getLastUpdate() {
+		return getLong("lastUpdate", -1);
+	}
+	
+	public void setLastUpdate() {
+		setLong("lastUpdate", System.currentTimeMillis());
 	}
 }

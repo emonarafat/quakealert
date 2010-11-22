@@ -3,10 +3,10 @@
 	android:orientation="vertical" android:layout_width="fill_parent"
 	android:layout_height="fill_parent">
 	<LinearLayout android:id="@+id/no_quakes_layout"
-		android:paddingLeft="16px" android:paddingRight="16px"
-		android:paddingTop="16px" android:paddingBottom="16px"
-		android:layout_marginLeft="32px" android:layout_marginRight="32px"
-		android:layout_marginTop="32px" android:layout_marginBottom="32px"
+		android:paddingLeft="16dp" android:paddingRight="16dp"
+		android:paddingTop="16dp" android:paddingBottom="16dp"
+		android:layout_marginLeft="32dp" android:layout_marginRight="32dp"
+		android:layout_marginTop="32dp" android:layout_marginBottom="32dp"
 		android:gravity="center" android:orientation="vertical"
 		android:layout_width="fill_parent" android:layout_height="fill_parent">
 		<TextView android:text="@string/no_quakes_summary"

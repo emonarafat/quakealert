@@ -9,18 +9,14 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
-import android.widget.Toast;
 
-import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.MapView;
 import com.google.android.maps.OverlayItem;
 import com.google.android.maps.Projection;
 
-public class QuakeOverlay extends ItemizedOverlay {
+public class QuakeOverlay extends ItemizedOverlay<OverlayItem> {
 	private static final int TEXTSIZE = 16;
 	private static final int TEXTLINES = 2;
 	private static final int PADDING = 2;
@@ -54,7 +50,6 @@ public class QuakeOverlay extends ItemizedOverlay {
 			bgGlowPaint.setAntiAlias(true);
 		}
 
-		private Quake quake;
 		Paint textPaint = new Paint();
 		int dmgMeters;
 		Paint markPaint = new Paint();
@@ -67,8 +62,6 @@ public class QuakeOverlay extends ItemizedOverlay {
 		Paint bgPaint = new Paint();
 
 		DrawValues(Quake quake) {
-			this.quake = quake;
-
 			s1 = "M" + quake.getMagnitude();
 			s2 = quake.getShortDateString();
 
@@ -172,9 +165,9 @@ public class QuakeOverlay extends ItemizedOverlay {
 		}
 		
 		canvas.drawCircle(point.x, point.y, radius + 2,
-				dvs.markGlowPaint);
+				DrawValues.markGlowPaint);
 		canvas.drawCircle(point.x, point.y, radius + 1,
-				dvs.markOutlinePaint);
+				DrawValues.markOutlinePaint);
 		canvas.drawCircle(point.x, point.y, radius, dvs.markPaint);
 
 		int dmgRadius = (int) projection.metersToEquatorPixels(dvs.dmgMeters);
@@ -207,8 +200,8 @@ public class QuakeOverlay extends ItemizedOverlay {
 			int rgy2 = ry2 + 2;
 			rectGlow.set(rgx1, rgy1, rgx2, rgy2);
 
-			canvas.drawRoundRect(rectGlow, 2, 2, dvs.bgGlowPaint);
-			canvas.drawRoundRect(rectOutline, 2, 2, dvs.bgOutlinePaint);
+			canvas.drawRoundRect(rectGlow, 2, 2, DrawValues.bgGlowPaint);
+			canvas.drawRoundRect(rectOutline, 2, 2, DrawValues.bgOutlinePaint);
 			canvas.drawRoundRect(rect, 2, 2, dvs.bgPaint);	
 			
 			int t1x = rx1 + PADDING;
