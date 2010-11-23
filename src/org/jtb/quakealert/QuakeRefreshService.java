@@ -79,6 +79,7 @@ public class QuakeRefreshService extends IntentService {
 		Log.d("quakealert", "received intent, action: " + intent.getAction());
 
 		if (intent.getAction().equals("refresh")) {
+			new Upgrader(this).upgrade();
 			refresh();
 		}
 	}

@@ -56,7 +56,7 @@ public class ListQuakesActivity extends Activity {
 
 		mThis = this;
 		quakePrefs = new QuakePrefs(this);
-		upgrade();
+		new Upgrader(this).upgrade();
 		listUpdateReceiver = new ListReceiver(this);
 		quakeAdapter = new QuakeAdapter(this, quakes);
 
@@ -216,69 +216,5 @@ public class ListQuakesActivity extends Activity {
 			return mServiceWarnDialog;
 		}
 		return null;
-	}
-
-	private void upgrade() {
-		PackageManager manager = getPackageManager();
-		PackageInfo info;
-		try {
-			info = manager.getPackageInfo(getPackageName(), 0);
-		} catch (NameNotFoundException e) {
-			Log.e("quakealert", "could not get version", e);
-			return;
-		}
-
-		if (!quakePrefs.isUpgradedTo(4)) {
-			// upgrade range from km to m
-			int km = quakePrefs.getRange();
-			if (km > 0) {
-				quakePrefs.setRange(km * 1000);
-			}
-		}
-		if (!quakePrefs.isUpgradedTo(16)) {
-			// upgrade interval
-			Interval i = null;
-			long interval = quakePrefs.getLong("interval", 0);
-			if (interval < 60 * 60 * 1000) {
-				// was set to 5 or 10 mins
-				i = Interval.FIFTEEN_MINUTES;
-			} else {
-				// was set to 1 or 3 hours
-				i = Interval.HOUR;
-			}
-			quakePrefs.setInterval(i);
-		}
-		if (!quakePrefs.isUpgradedTo(20)) {
-			// if using 100km range, set to 250km
-			// 100km is removed
-			int km = quakePrefs.getRange();
-			if (km == 100) {
-				quakePrefs.setRange(250);
-			}
-		}
-		if (!quakePrefs.isUpgradedTo(30)) {
-			// set old float magnitude value to constant
-			String m = quakePrefs.getString("magnitude", null);
-			if (m != null && m.contains(".")) {
-				float f = Float.parseFloat(m);
-				Magnitude mag = Magnitude.valueOf(f);
-				quakePrefs.setMagnitude(mag);
-			}
-
-			// set old string units value to constant
-			String u = quakePrefs.getString("units", null);
-			if (u != null && Character.isLowerCase(u.charAt(0))) {
-				Units units;
-				if (u.equals("metric")) {
-					units = Units.METRIC;
-				} else {
-					units = Units.US;
-				}
-				quakePrefs.setUnits(units);
-			}
-
-		}
-
-		quakePrefs.setUpgradedTo(info.versionCode);
 	}
 }
