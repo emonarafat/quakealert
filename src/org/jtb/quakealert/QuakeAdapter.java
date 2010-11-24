@@ -48,7 +48,7 @@ public class QuakeAdapter extends ArrayAdapter<Quake> {
 
 		TextView row2Text = (TextView) view.findViewById(R.id.row2_text);
 		String row2 = q.getListDateString();
-		if (quakePrefs.getRange() != -1) {
+		if (location != null) {
 			Distance d = new Distance(q.getDistance(location));
 			row2 += ", " + d.toString(quakePrefs);
 		}

@@ -85,9 +85,6 @@ public class QuakeRefreshService extends IntentService {
 	}
 
 	private static void setLocation(Context context, QuakePrefs quakePrefs) {
-		if (quakePrefs.getRange() == -1) {
-			return;
-		}
 		LocationManager lm = (LocationManager) context
 				.getSystemService(Context.LOCATION_SERVICE);
 		String name = lm.getBestProvider(new Criteria(), true);
