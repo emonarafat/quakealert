@@ -136,6 +136,16 @@ public class QuakePrefs {
 		return Units.valueOf(u);
 	}
 
+	public Theme getTheme() {
+		String t = getString("theme", "LIGHT");
+		return Theme.valueOf(t);
+	}
+
+	public Age getMaxAge() {
+		String a = getString("maxAge", "THREE");
+		return Age.valueOf(a);
+	}
+
 	public void setUnits(Units units) {
 		setString("units", units.toString());
 	}

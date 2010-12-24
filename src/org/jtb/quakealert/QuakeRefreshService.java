@@ -12,7 +12,7 @@ import android.location.LocationManager;
 import android.util.Log;
 
 public class QuakeRefreshService extends IntentService {
-	private static int MAX_QUAKES = 1000;
+	private static int MAX_QUAKES = 100;
 	private static final Quakes quakes = new Quakes();
 	static Location location = null;
 	static ArrayList<Quake> matchQuakes = new ArrayList<Quake>();
@@ -114,9 +114,10 @@ public class QuakeRefreshService extends IntentService {
 		newCount = 0;
 
 		int quakeListSize = quakeList.size();
+		Age age = prefs.getMaxAge();
 		for (int i = 0; i < quakeListSize; i++) {
 			Quake quake = quakeList.get(i);
-			if (quake.matches(magnitude, range, location)) {
+			if (quake.matches(magnitude, range, location, age)) {
 				matchQuakes.add(quake);
 				if (quake.isNewQuake()) {
 					newCount++;

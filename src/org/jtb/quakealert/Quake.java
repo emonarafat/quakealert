@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,11 +20,11 @@ public class Quake {
 	private static final Pattern QUAKE_PATTERN = Pattern
 			.compile("([^,]+),([^,]+),([^,]+),\"([^\"]+) UTC\",([^,]+),([^,]+),([^,]+),([^,]+),\\s?([^,]+),\"([^\"]+)\"");
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(
-			"EEEE, MMMM d, yyyy HH:mm:ss");
+			"EEEE, MMMM d, yyyy HH:mm:ss", Locale.US);
 	private static final SimpleDateFormat SHORT_DATE_FORMAT = new SimpleDateFormat(
-			"EEE, h:mm a");
+			"EEE, h:mm a", Locale.US);
 	private static final SimpleDateFormat LIST_DATE_FORMAT = new SimpleDateFormat(
-			"EEEE, MMM d, h:mm a");
+			"EEEE, MMM d, h:mm a", Locale.US);
 	private static final int ZONE_OFFSET = Calendar.getInstance().get(
 			Calendar.ZONE_OFFSET);
 	private static final int DST_OFFSET = Calendar.getInstance().get(
@@ -136,10 +137,13 @@ public class Quake {
 		return SHORT_DATE_FORMAT.format(d);
 	}
 
-	public boolean matches(float magnitude, int range, Location location) {
+	public boolean matches(float magnitude, int range, Location location, Age age) {
+		// matches magnitude?
 		if (this.magnitude < magnitude) {
 			return false;
 		}
+		
+		// matches location?
 		if (range > 0) {
 			float distance = getDistance(location);
 			// Log.d("quakealert", "range: " + range +
@@ -148,6 +152,11 @@ public class Quake {
 			if (distance > range) {
 				return false;
 			}
+		}
+		
+		// matches age?
+		if (date.getTime() < (System.currentTimeMillis() - age.toMillis())) {
+			return false;
 		}
 
 		return true;

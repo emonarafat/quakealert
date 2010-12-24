@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 	<PreferenceCategory android:title="Display">
-		<ListPreference android:title="Range"
+		<ListPreference android:title="Range?"
 			android:summary="Quakes within this range will be reported."
 			android:key="range" android:defaultValue="-1" android:entryValues="@array/range_values" />
-		<ListPreference android:title="Magnitude"
+		<ListPreference android:title="Magnitude?"
 			android:summary="Quakes with at least this magnitude will be reported."
 			android:key="magnitude" android:defaultValue="M3"
 			android:entries="@array/magnitude_entries" android:entryValues="@array/magnitude_values" />
+		<ListPreference android:title="Maximum Age?"
+			android:summary="Quakes older than this will not be listed."
+			android:key="maxAge" android:defaultValue="THREE"
+			android:entries="@array/maxAge_entries" android:entryValues="@array/maxAge_values" />
 		<ListPreference android:title="Units"
 			android:summary="Set units to use when displaying distances (US or metric)."
 			android:key="units" android:defaultValue="METRIC" android:entries="@array/units_entries"
@@ -15,6 +19,10 @@
 		<CheckBoxPreference android:title="Zoom to fit?"
 			android:summary="Zoom map to fit all listed quakes?" android:key="zoomToFit"
 			android:defaultValue="false" />
+		<ListPreference android:title="Theme"
+			android:summary="Quake list theme."
+			android:key="theme" android:defaultValue="LIGHT" android:entries="@array/theme_entries"
+			android:entryValues="@array/theme_values" />
 	</PreferenceCategory>
 	<PreferenceCategory android:title="Notifications">
 		<CheckBoxPreference android:title="Send Notifications?"

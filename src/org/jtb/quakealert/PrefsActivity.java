@@ -16,12 +16,15 @@ public class PrefsActivity extends PreferenceActivity implements
 		OnSharedPreferenceChangeListener {
 	static final int CHANGED_RESULT = 1;
 	static final int UNCHANGED_RESULT = 0;
+	static final int RESET_RESULT = 2;
 
 	private PrefsActivity mThis;
 	private ListPreference mRangePreference;
 	private ListPreference mMagnitudePreference;
 	private ListPreference mUnitsPreference;
 	private ListPreference mIntervalPreference;
+	private ListPreference mThemePreference;
+	private ListPreference mMaxAgePreference;
 	private CheckBoxPreference mAlertPreference;
 	private RingtonePreference mAlertSoundPreference;
 	private CheckBoxPreference mVibratePreference;
@@ -41,25 +44,25 @@ public class PrefsActivity extends PreferenceActivity implements
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		mQuakePrefs = new QuakePrefs(this);
+		setTheme(mQuakePrefs.getTheme().getId());
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.layout.prefs);
 
 		mThis = this;
 		setResult(UNCHANGED_RESULT);
-		mQuakePrefs = new QuakePrefs(this);
 
 		mRangePreference = (ListPreference) findPreference("range");
 		mMagnitudePreference = (ListPreference) findPreference("magnitude");
 		mUnitsPreference = (ListPreference) findPreference("units");
-		mIntervalPreference = (ListPreference) findPreference("interval");
-		mAlertPreference = (CheckBoxPreference) findPreference("notificationAlert");
-		mAlertSoundPreference = (RingtonePreference) findPreference("notificationAlertSound");
-		mVibratePreference = (CheckBoxPreference) findPreference("notificationVibrate");
-		mFlashPreference = (CheckBoxPreference) findPreference("notificationFlash");
-		mBootStartPreference = (CheckBoxPreference) findPreference("bootStart");
 
-		QuakePrefs qp = new QuakePrefs(this);
-
+		Preference.OnPreferenceChangeListener resetListener = new Preference.OnPreferenceChangeListener() {
+			public boolean onPreferenceChange(Preference preference,
+					Object newValue) {
+				setResult(RESET_RESULT);
+				return true;
+			}
+		};
 		Preference.OnPreferenceChangeListener changedListener = new Preference.OnPreferenceChangeListener() {
 			public boolean onPreferenceChange(Preference preference,
 					Object newValue) {
@@ -67,6 +70,19 @@ public class PrefsActivity extends PreferenceActivity implements
 				return true;
 			}
 		};
+		
+		mThemePreference = (ListPreference) findPreference("theme");
+		mThemePreference.setOnPreferenceChangeListener(resetListener);
+
+		mMaxAgePreference = (ListPreference) findPreference("maxAge");
+		mMaxAgePreference.setOnPreferenceChangeListener(changedListener);
+		
+		mIntervalPreference = (ListPreference) findPreference("interval");
+		mAlertPreference = (CheckBoxPreference) findPreference("notificationAlert");
+		mAlertSoundPreference = (RingtonePreference) findPreference("notificationAlertSound");
+		mVibratePreference = (CheckBoxPreference) findPreference("notificationVibrate");
+		mFlashPreference = (CheckBoxPreference) findPreference("notificationFlash");
+		mBootStartPreference = (CheckBoxPreference) findPreference("bootStart");
 
 		mRangePreference.setOnPreferenceChangeListener(changedListener);
 		mMagnitudePreference.setOnPreferenceChangeListener(changedListener);
@@ -134,7 +150,7 @@ public class PrefsActivity extends PreferenceActivity implements
 		};
 
 		ListPreference ip = (ListPreference) findPreference("interval");
-		ip.setEnabled(qp.isNotificationsEnabled());
+		ip.setEnabled(mQuakePrefs.isNotificationsEnabled());
 		ip.setOnPreferenceChangeListener(intervalListener);
 		ip.setOnPreferenceClickListener(intervalWarnListener);
 
@@ -163,6 +179,8 @@ public class PrefsActivity extends PreferenceActivity implements
 		setMagnitudeTitle();
 		setUnitsTitle();
 		setIntervalTitle();
+		setThemeTitle();
+		setMaxAgeTitle();
 		
 		getPreferenceScreen().getSharedPreferences()
 				.registerOnSharedPreferenceChangeListener(this);
@@ -189,6 +207,16 @@ public class PrefsActivity extends PreferenceActivity implements
 		mIntervalPreference.setTitle("Interval? (" + i.getTitle(this) + ")");
 	}
 
+	private void setThemeTitle() {
+		Theme t = mQuakePrefs.getTheme();
+		mThemePreference.setTitle("Theme? (" + t.getTitle(this) + ")");
+	}
+
+	private void setMaxAgeTitle() {
+		Age a = mQuakePrefs.getMaxAge();
+		mMaxAgePreference.setTitle("Maximum Age? (" + a.getTitle(this) + ")");
+	}
+
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
 		if (key.equals("range")) {
@@ -201,7 +229,12 @@ public class PrefsActivity extends PreferenceActivity implements
 			setUnitsTitle();
 			setRangeEntries();
 			setRangeTitle();
+		} else if (key.equals("theme")) {
+			setThemeTitle();
+		} else if (key.equals("maxAge")) {
+			setMaxAgeTitle();
 		}
+		
 	}
 
 }

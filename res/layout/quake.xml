@@ -3,10 +3,10 @@
 	android:orientation="horizontal" android:layout_width="wrap_content"
 	android:layout_height="fill_parent">
 	<LinearLayout android:orientation="horizontal" android:id="@+id/severity"
-		android:layout_width="8px" android:layout_height="fill_parent" />
+		android:layout_width="8dp" android:layout_height="fill_parent" />
 	<LinearLayout android:orientation="vertical" android:id="@+id/severity"
 		android:layout_width="fill_parent" android:layout_height="fill_parent"
-		android:paddingLeft="4px">
+		android:paddingLeft="4dp">
 		<TextView android:id="@+id/row1_text" android:text="M5.1 - Northern California"
 			android:textSize="18dp" android:layout_width="fill_parent"
 			android:layout_height="wrap_content" android:singleLine="true" />

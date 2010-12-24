@@ -1,3 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<style name="Theme.Light" parent="@android:Theme.Light">
+		<item name="cacheColorHint">#ffffff</item>
+		<item name="background">#ffffff</item>
+	</style>
+	<style name="Theme" parent="@android:Theme">
+		<item name="cacheColorHint">#000000</item>
+		<item name="background">#000000</item>
+	</style>
 </resources>
