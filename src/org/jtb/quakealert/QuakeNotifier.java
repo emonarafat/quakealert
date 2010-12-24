@@ -48,12 +48,12 @@ public class QuakeNotifier {
 					100, 100 };
 		}
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
-		if (QuakeRefreshService.newCount > 1) {
-			notification.number = QuakeRefreshService.newCount;
+		if (RefreshService.newCount > 1) {
+			notification.number = RefreshService.newCount;
 		}
 
 		CharSequence contentTitle = "Quake Alert!";
-		CharSequence contentText = QuakeRefreshService.newCount + " new "
+		CharSequence contentText = RefreshService.newCount + " new "
 				+ quakePrefs.getMagnitude().getTitle(context) + " quakes";
 		if (quakePrefs.getRange() != -1) {
 			Distance d = new Distance(quakePrefs.getRange());
@@ -69,6 +69,6 @@ public class QuakeNotifier {
 				contentIntent);
 		nm.notify(ALERT_ID, notification);
 		Log.d("quakealert", "notification sent, "
-				+ QuakeRefreshService.newCount + " new");
+				+ RefreshService.newCount + " new");
 	}
 }

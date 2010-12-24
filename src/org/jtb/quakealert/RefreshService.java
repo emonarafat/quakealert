@@ -11,7 +11,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.util.Log;
 
-public class QuakeRefreshService extends IntentService {
+public class RefreshService extends IntentService {
 	private static int MAX_QUAKES = 100;
 	private static final Quakes quakes = new Quakes();
 	static Location location = null;
@@ -70,18 +70,15 @@ public class QuakeRefreshService extends IntentService {
 		}
 	}
 
-	public QuakeRefreshService() {
+	public RefreshService() {
 		super("quakeRefreshService");
 	}
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		Log.d("quakealert", "received intent, action: " + intent.getAction());
-
-		if (intent.getAction().equals("refresh")) {
-			new Upgrader(this).upgrade();
-			refresh();
-		}
+		Log.d("quakealert", "refresh service, refreshing ...");
+		new Upgrader(this).upgrade();
+		refresh();
 	}
 
 	private static void setLocation(Context context, QuakePrefs quakePrefs) {

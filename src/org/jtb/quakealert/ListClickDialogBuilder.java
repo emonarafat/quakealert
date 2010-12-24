@@ -25,7 +25,7 @@ public class ListClickDialogBuilder extends AlertDialog.Builder {
 					mContext.startActivity(i);
 					break;
 				case 1:
-					Quake quake = QuakeRefreshService.matchQuakes.get(mPosition);
+					Quake quake = RefreshService.matchQuakes.get(mPosition);
 					String u = quake.getDetailUrl();
 					mContext.startActivity( new Intent( Intent.ACTION_VIEW, Uri.parse(u)));
 					break;

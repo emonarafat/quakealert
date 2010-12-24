@@ -78,9 +78,8 @@ public class ListQuakesActivity extends Activity {
 
 				final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 				lm.removeUpdates(mLocationListener);
-				sendBroadcast(new Intent("refresh", null,
-						ListQuakesActivity.this, QuakeRefreshReceiver.class));
-
+				sendBroadcast(new Intent("refresh", null, ListQuakesActivity.this,
+						RefreshReceiver.class));				
 				break;
 			case REFRESH_SHOW_WHAT:
 				showDialog(REFRESH_DIALOG);
@@ -133,7 +132,7 @@ public class ListQuakesActivity extends Activity {
 
 		if (quakePrefs.isNotificationsEnabled()) {
 			sendBroadcast(new Intent("schedule", null, this,
-					QuakeRefreshReceiver.class));
+					RefreshReceiver.class));
 		}
 
 		mLocationListener = new LocationListener() {
@@ -165,6 +164,13 @@ public class ListQuakesActivity extends Activity {
 		}
 
 		getLocation();
+	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		lm.removeUpdates(mLocationListener);
 	}
 
 	private void getLocation() {
@@ -201,14 +207,14 @@ public class ListQuakesActivity extends Activity {
 	}
 
 	public void updateList() {
-		if (QuakeRefreshService.matchQuakes != null
-				&& QuakeRefreshService.matchQuakes.size() > 0) {
+		if (RefreshService.matchQuakes != null
+				&& RefreshService.matchQuakes.size() > 0) {
 
 			quakePrefs.setLastUpdate();
 
 			quakes.clear();
-			quakes.addAll(QuakeRefreshService.matchQuakes);
-			quakeAdapter.setLocation(QuakeRefreshService.location);
+			quakes.addAll(RefreshService.matchQuakes);
+			quakeAdapter.setLocation(RefreshService.location);
 			quakeAdapter.notifyDataSetChanged();
 
 			mNoQuakesLayout.setVisibility(View.GONE);
@@ -266,8 +272,8 @@ public class ListQuakesActivity extends Activity {
 		case PREFS_REQUEST:
 			switch (resultCode) {
 			case PrefsActivity.CHANGED_RESULT:
-				sendBroadcast(new Intent("refresh", null, this,
-						QuakeRefreshReceiver.class));
+				startService(new Intent("refresh", null,
+						ListQuakesActivity.this, RefreshService.class));
 				break;
 			case PrefsActivity.RESET_RESULT:
 				finish();

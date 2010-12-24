@@ -30,14 +30,14 @@ public class QuakeMapActivity extends MapActivity {
 					.get("org.jtb.quakealert.quake.position") : null;
 		}
 
-		Quake quake = QuakeRefreshService.matchQuakes.get(p);
+		Quake quake = RefreshService.matchQuakes.get(p);
 		mMapView.setBuiltInZoomControls(true);
 		mMapView.setSatellite(true);
 		
 		List<Overlay> mapOverlays = mMapView.getOverlays();
-		int size = QuakeRefreshService.matchQuakes.size();
+		int size = RefreshService.matchQuakes.size();
 		for (int i = size - 1; i != -1; i--) {
-			Quake q = QuakeRefreshService.matchQuakes.get(i);
+			Quake q = RefreshService.matchQuakes.get(i);
 
 			Drawable drawable = this.getResources().getDrawable(R.drawable.one);
 			QuakeOverlay itemizedOverlay = new QuakeOverlay(drawable, q);
@@ -50,7 +50,7 @@ public class QuakeMapActivity extends MapActivity {
 
 		QuakePrefs qp = new QuakePrefs(this);
 		if (qp.isZoomToFit()) {
-			zoomToSpan(QuakeRefreshService.matchQuakes, quake);
+			zoomToSpan(RefreshService.matchQuakes, quake);
 		} else {
 			zoomToMagnitude(quake);
 		}

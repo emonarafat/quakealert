@@ -10,6 +10,7 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.RingtonePreference;
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 
 public class PrefsActivity extends PreferenceActivity implements
@@ -30,6 +31,7 @@ public class PrefsActivity extends PreferenceActivity implements
 	private CheckBoxPreference mVibratePreference;
 	private CheckBoxPreference mFlashPreference;
 	private CheckBoxPreference mBootStartPreference;
+	private CheckBoxPreference mNotificationsPreference;
 
 	private AlertDialog mIntervalWarnDialog;
 	private QuakePrefs mQuakePrefs;
@@ -54,86 +56,9 @@ public class PrefsActivity extends PreferenceActivity implements
 
 		mRangePreference = (ListPreference) findPreference("range");
 		mMagnitudePreference = (ListPreference) findPreference("magnitude");
-		mUnitsPreference = (ListPreference) findPreference("units");
-
-		Preference.OnPreferenceChangeListener resetListener = new Preference.OnPreferenceChangeListener() {
-			public boolean onPreferenceChange(Preference preference,
-					Object newValue) {
-				setResult(RESET_RESULT);
-				return true;
-			}
-		};
-		Preference.OnPreferenceChangeListener changedListener = new Preference.OnPreferenceChangeListener() {
-			public boolean onPreferenceChange(Preference preference,
-					Object newValue) {
-				setResult(CHANGED_RESULT);
-				return true;
-			}
-		};
-		
 		mThemePreference = (ListPreference) findPreference("theme");
-		mThemePreference.setOnPreferenceChangeListener(resetListener);
-
 		mMaxAgePreference = (ListPreference) findPreference("maxAge");
-		mMaxAgePreference.setOnPreferenceChangeListener(changedListener);
-		
 		mIntervalPreference = (ListPreference) findPreference("interval");
-		mAlertPreference = (CheckBoxPreference) findPreference("notificationAlert");
-		mAlertSoundPreference = (RingtonePreference) findPreference("notificationAlertSound");
-		mVibratePreference = (CheckBoxPreference) findPreference("notificationVibrate");
-		mFlashPreference = (CheckBoxPreference) findPreference("notificationFlash");
-		mBootStartPreference = (CheckBoxPreference) findPreference("bootStart");
-
-		mRangePreference.setOnPreferenceChangeListener(changedListener);
-		mMagnitudePreference.setOnPreferenceChangeListener(changedListener);
-
-		Preference.OnPreferenceChangeListener unitsListener = new Preference.OnPreferenceChangeListener() {
-			public boolean onPreferenceChange(Preference preference,
-					Object newValue) {
-				String u = (String) newValue;
-				Units units = Units.valueOf(u);
-				mQuakePrefs.setUnits(units);
-				setRangeEntries();
-
-				sendBroadcast(new Intent("updateList"));
-				return true;
-			}
-		};
-
-		mUnitsPreference.setOnPreferenceChangeListener(unitsListener);
-
-		Preference.OnPreferenceChangeListener notificationsListener = new Preference.OnPreferenceChangeListener() {
-			public boolean onPreferenceChange(Preference preference,
-					Object newValue) {
-				boolean checked = ((Boolean) newValue).booleanValue();
-				if (checked) {
-					setNotificationsEnabled(true);
-					
-					sendBroadcast(new Intent("schedule", null, mThis,
-							QuakeRefreshReceiver.class));
-				} else {
-					setNotificationsEnabled(false);
-					
-					sendBroadcast(new Intent("cancel", null, mThis,
-							QuakeRefreshReceiver.class));
-				}
-				return true;
-			}
-		};
-
-		Preference.OnPreferenceChangeListener intervalListener = new Preference.OnPreferenceChangeListener() {
-			public boolean onPreferenceChange(Preference preference,
-					Object newValue) {
-				String is = (String) newValue;
-				Interval i = Interval.valueOf(is);
-				QuakePrefs qp = new QuakePrefs(mThis);
-				qp.setInterval(i);
-				sendBroadcast(new Intent("schedule", null, mThis,
-						QuakeRefreshReceiver.class));
-
-				return true;
-			}
-		};
 		Preference.OnPreferenceClickListener intervalWarnListener = new Preference.OnPreferenceClickListener() {
 			public boolean onPreferenceClick(Preference preference) {
 				AlertDialog.Builder builder = new WarnDialogBuilder(
@@ -148,14 +73,16 @@ public class PrefsActivity extends PreferenceActivity implements
 				return true;
 			}
 		};
-
-		ListPreference ip = (ListPreference) findPreference("interval");
-		ip.setEnabled(mQuakePrefs.isNotificationsEnabled());
-		ip.setOnPreferenceChangeListener(intervalListener);
-		ip.setOnPreferenceClickListener(intervalWarnListener);
-
-		CheckBoxPreference cbp = (CheckBoxPreference) findPreference("notificationsEnabled");
-		cbp.setOnPreferenceChangeListener(notificationsListener);
+		mIntervalPreference.setEnabled(mQuakePrefs.isNotificationsEnabled());
+		mIntervalPreference.setOnPreferenceClickListener(intervalWarnListener);
+		
+		mAlertPreference = (CheckBoxPreference) findPreference("notificationAlert");
+		mAlertSoundPreference = (RingtonePreference) findPreference("notificationAlertSound");
+		mVibratePreference = (CheckBoxPreference) findPreference("notificationVibrate");
+		mFlashPreference = (CheckBoxPreference) findPreference("notificationFlash");
+		mBootStartPreference = (CheckBoxPreference) findPreference("bootStart");
+		mUnitsPreference = (ListPreference) findPreference("units");
+		mNotificationsPreference = (CheckBoxPreference) findPreference("notificationsEnabled");		
 		
 		setNotificationsEnabled(mQuakePrefs.isNotificationsEnabled());
 	}
@@ -219,21 +146,41 @@ public class PrefsActivity extends PreferenceActivity implements
 
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
+		Log.d("quakealert", "preference changed: " + key);
+		
 		if (key.equals("range")) {
 			setRangeTitle();
+			setResult(CHANGED_RESULT);		
 		} else if (key.equals("magnitude")) {
 			setMagnitudeTitle();
+			setResult(CHANGED_RESULT);
+		} else if (key.equals("theme")) {
+			setThemeTitle();
+			setResult(RESET_RESULT);
+		} else if (key.equals("maxAge")) {
+			setMaxAgeTitle();
+			setResult(CHANGED_RESULT);
 		} else if (key.equals("interval")) {
 			setIntervalTitle();
+			sendBroadcast(new Intent("schedule", null, mThis,
+					RefreshReceiver.class));
 		} else if (key.equals("units")) {
 			setUnitsTitle();
 			setRangeEntries();
 			setRangeTitle();
-		} else if (key.equals("theme")) {
-			setThemeTitle();
-		} else if (key.equals("maxAge")) {
-			setMaxAgeTitle();
+			sendBroadcast(new Intent("updateList"));
+		} else if (key.equals("notificationsEnabled")) {
+			if (mQuakePrefs.isNotificationsEnabled()) {
+				setNotificationsEnabled(true);
+				sendBroadcast(new Intent("schedule", null, mThis,
+						RefreshReceiver.class));				
+			} else {
+				setNotificationsEnabled(false);
+				sendBroadcast(new Intent("cancel", null, mThis,
+						RefreshReceiver.class));				
+			}
 		}
+		
 		
 	}
 

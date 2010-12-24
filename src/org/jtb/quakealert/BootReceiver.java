@@ -15,6 +15,6 @@ public class BootReceiver extends BroadcastReceiver {
 		if (!prefs.isBootStart()) {
 			return;
 		}
-		context.sendBroadcast(new Intent("schedule", null, context, QuakeRefreshReceiver.class));
+		context.sendBroadcast(new Intent("schedule", null, context, RefreshReceiver.class));
 	}
 }

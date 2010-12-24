@@ -8,16 +8,19 @@ import android.content.Intent;
 import android.os.SystemClock;
 import android.util.Log;
 
-public class QuakeRefreshReceiver extends BroadcastReceiver {
+public class RefreshReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.d("quakealert", "received intent, action: " + intent.getAction());
+		Log.d("quakealert", "refresh receiver, action: " + intent.getAction());
 
-		if (intent.getAction().equals("refresh")) {
+		if (intent.getAction().equals("location")) {
+			context.startService(new Intent(context,
+					LocationService.class));
+		} else if (intent.getAction().equals("refresh")) {
 			Lock.acquire(context);
-			context.startService(new Intent("refresh", null, context,
-					QuakeRefreshService.class));
+			context.startService(new Intent(context,
+					RefreshService.class));			
 		} else if (intent.getAction().equals("schedule")) {
 			schedule(context);
 		} else if (intent.getAction().equals("cancel")) {
@@ -28,8 +31,8 @@ public class QuakeRefreshReceiver extends BroadcastReceiver {
 	private void schedule(Context context) {
 		AlarmManager mgr = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
-		Intent i = new Intent("refresh", null, context,
-				QuakeRefreshReceiver.class);
+		Intent i = new Intent("location", null, context,
+				RefreshReceiver.class);
 		PendingIntent pi = PendingIntent.getBroadcast(context, 0, i,
 				PendingIntent.FLAG_UPDATE_CURRENT);
 		mgr.cancel(pi);
@@ -44,8 +47,8 @@ public class QuakeRefreshReceiver extends BroadcastReceiver {
 	private void cancel(Context context) {
 		AlarmManager mgr = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
-		Intent i = new Intent("refresh", null, context,
-				QuakeRefreshReceiver.class);
+		Intent i = new Intent("location", null, context,
+				RefreshReceiver.class);
 		PendingIntent pi = PendingIntent.getBroadcast(context, 0, i,
 				PendingIntent.FLAG_CANCEL_CURRENT);
 		mgr.cancel(pi);
