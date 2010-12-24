@@ -29,14 +29,16 @@ public class LocationService extends Service {
 	private void handleCommand(Intent intent, final int startId) {
 		super.onStart(intent, startId);
 
+		long timeout = intent.getLongExtra("timeout", 1000 * 60 * 2);
+		final Intent broadcastIntent = intent.getParcelableExtra("broadcastIntent");
+		
 		final Timer timer = new Timer();
 
 		final LocationListener locationListener = new LocationListener() {
 			public void onLocationChanged(Location location) {
 				Log.d("quakealert", "location service, location changed: " + location);
 				timer.cancel();
-				sendBroadcast(new Intent("refresh", null, LocationService.this,
-						RefreshReceiver.class));				
+				sendBroadcast(broadcastIntent);				
 				stopSelfResult(startId);
 			}
 
@@ -61,13 +63,12 @@ public class LocationService extends Service {
 			public void run() {
 				Log.d("quakealert", "location serivce, could not get location, aborting");
 				lm.removeUpdates(locationListener);
-				sendBroadcast(new Intent("refresh", null, LocationService.this,
-						RefreshReceiver.class));				
+				sendBroadcast(broadcastIntent);				
 				stopSelfResult(startId);
 			}
 			
 		};
-		timer.schedule(tt, 1000 * 60 * 2); // 2 minutes
+		timer.schedule(tt, timeout); // 2 minutes
 	}
 
 }

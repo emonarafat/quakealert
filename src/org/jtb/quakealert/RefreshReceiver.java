@@ -15,8 +15,12 @@ public class RefreshReceiver extends BroadcastReceiver {
 		Log.d("quakealert", "refresh receiver, action: " + intent.getAction());
 
 		if (intent.getAction().equals("location")) {
-			context.startService(new Intent(context,
-					LocationService.class));
+			Intent broadcastIntent = new Intent("refresh", null, context,
+					RefreshReceiver.class);
+			Intent locationIntent = new Intent(context, LocationService.class);
+			locationIntent.putExtra("timeout", 1000 * 60 * 2); // 2 minutes
+			locationIntent.putExtra("broadcastIntent", broadcastIntent);
+			context.startService(locationIntent);
 		} else if (intent.getAction().equals("refresh")) {
 			Lock.acquire(context);
 			context.startService(new Intent(context,
