@@ -7,12 +7,12 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.util.Log;
 
 public class Upgrader {
-	private QuakePrefs mQuakePrefs;
+	private Prefs mQuakePrefs;
 	private Context mContext;
 	
 	public Upgrader(Context c) {
 		mContext = c;
-		mQuakePrefs = new QuakePrefs(mContext);
+		mQuakePrefs = new Prefs(mContext);
 	}
 	
 	public void upgrade() {

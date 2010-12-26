@@ -42,7 +42,7 @@ public class WarnDialogBuilder extends AlertDialog.Builder {
 			public void onCheckedChanged(CompoundButton buttonView,
 					boolean isChecked) {
 				if (isChecked) {
-					QuakePrefs qp = new QuakePrefs(mContext);
+					Prefs qp = new Prefs(mContext);
 					qp.setWarn(mWarnId, false);
 				}
 			}

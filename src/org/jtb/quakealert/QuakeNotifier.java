@@ -12,11 +12,11 @@ public class QuakeNotifier {
 	private static final int ALERT_ID = 0;
 
 	private Context context;
-	private QuakePrefs quakePrefs;
+	private Prefs quakePrefs;
 
 	public QuakeNotifier(Context context) {
 		this.context = context;
-		quakePrefs = new QuakePrefs(context);
+		quakePrefs = new Prefs(context);
 	}
 
 	public void cancel() {

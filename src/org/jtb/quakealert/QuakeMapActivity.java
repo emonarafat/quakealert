@@ -48,7 +48,7 @@ public class QuakeMapActivity extends MapActivity {
 			mapOverlays.add(itemizedOverlay);
 		}
 
-		QuakePrefs qp = new QuakePrefs(this);
+		Prefs qp = new Prefs(this);
 		if (qp.isZoomToFit()) {
 			zoomToSpan(RefreshService.matchQuakes, quake);
 		} else {

@@ -31,7 +31,7 @@ public class Distance {
 		return getMiles() + " miles";
 	}
 
-	public String toString(QuakePrefs qp) {
+	public String toString(Prefs qp) {
 		Units units = qp.getUnits();
 		if (meters == -1) {
 			return "Show All";

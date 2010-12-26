@@ -63,7 +63,7 @@ public class ListQuakesActivity extends Activity {
 	private ListView mList;
 	private LinearLayout mNoQuakesLayout;
 	private ListReceiver listUpdateReceiver;
-	private QuakePrefs quakePrefs;
+	private Prefs quakePrefs;
 	private QuakeAdapter quakeAdapter;
 	private List<Quake> quakes = new ArrayList<Quake>();
 	private LocationListener mLocationListener;
@@ -78,8 +78,8 @@ public class ListQuakesActivity extends Activity {
 
 				final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 				lm.removeUpdates(mLocationListener);
-				sendBroadcast(new Intent("refresh", null, ListQuakesActivity.this,
-						RefreshReceiver.class));				
+				sendBroadcast(new Intent("refresh", null,
+						ListQuakesActivity.this, RefreshReceiver.class));
 				break;
 			case REFRESH_SHOW_WHAT:
 				showDialog(REFRESH_DIALOG);
@@ -108,7 +108,7 @@ public class ListQuakesActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		quakePrefs = new QuakePrefs(this);
+		quakePrefs = new Prefs(this);
 		setTheme(quakePrefs.getTheme().getId());
 		setContentView(R.layout.list);
 
@@ -137,7 +137,7 @@ public class ListQuakesActivity extends Activity {
 
 		mLocationListener = new LocationListener() {
 			public void onLocationChanged(Location location) {
-				Log.d("quakealert", "location changed: " + location);
+				Log.d("quakealert", "list, got location changed: " + location);
 				mHandler.sendEmptyMessage(LOCATION_CANCEL_WHAT);
 			}
 
@@ -165,7 +165,7 @@ public class ListQuakesActivity extends Activity {
 
 		getLocation();
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
@@ -174,10 +174,23 @@ public class ListQuakesActivity extends Activity {
 	}
 
 	private void getLocation() {
+		if (!quakePrefs.isUseLocation()) {
+			sendBroadcast(new Intent("refresh", null, ListQuakesActivity.this,
+					RefreshReceiver.class));
+			return;
+		}
+
 		showDialog(LOCATION_DIALOG);
 		final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0,
-				mLocationListener);
+
+		Location l = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		if (l == null) {
+			lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0,
+					mLocationListener);
+		} else {
+			sendBroadcast(new Intent("refresh", null, ListQuakesActivity.this,
+					RefreshReceiver.class));
+		}
 	}
 
 	@Override
@@ -240,7 +253,7 @@ public class ListQuakesActivity extends Activity {
 	private void view(String url) {
 		Intent intent = new Intent(Intent.ACTION_VIEW);
 		intent.setData(Uri.parse(url));
-		startActivity(intent);		
+		startActivity(intent);
 	}
 
 	@Override
@@ -259,8 +272,8 @@ public class ListQuakesActivity extends Activity {
 		case R.id.report_item:
 			view(REPORT_URL);
 			return true;
-		}		
-		
+		}
+
 		return false;
 	}
 
@@ -272,8 +285,7 @@ public class ListQuakesActivity extends Activity {
 		case PREFS_REQUEST:
 			switch (resultCode) {
 			case PrefsActivity.CHANGED_RESULT:
-				startService(new Intent("refresh", null,
-						ListQuakesActivity.this, RefreshService.class));
+				getLocation();
 				break;
 			case PrefsActivity.RESET_RESULT:
 				finish();

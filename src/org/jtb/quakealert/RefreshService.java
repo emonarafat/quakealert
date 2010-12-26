@@ -12,7 +12,6 @@ import android.location.LocationManager;
 import android.util.Log;
 
 public class RefreshService extends IntentService {
-	private static int MAX_QUAKES = 100;
 	private static final Quakes quakes = new Quakes();
 	static Location location = null;
 	static ArrayList<Quake> matchQuakes = new ArrayList<Quake>();
@@ -21,7 +20,7 @@ public class RefreshService extends IntentService {
 	private void refresh() {
 		Log.d("quakealert", "refreshing");
 		try {
-			QuakePrefs quakePrefs = new QuakePrefs(this);
+			Prefs quakePrefs = new Prefs(this);
 			sendBroadcast(new Intent("showRefreshDialog"));
 			setLocation(this, quakePrefs);
 
@@ -53,10 +52,6 @@ public class RefreshService extends IntentService {
 			Log.d("quakealert", mqsSize + " matches");
 
 			Collections.sort(matchQuakes, new Quake.ListComparator());
-			if (mqsSize > MAX_QUAKES) {
-				matchQuakes = new ArrayList<Quake>(matchQuakes.subList(0,
-						MAX_QUAKES));
-			}
 
 			if (newCount > 0 && quakePrefs.isNotificationsEnabled()) {
 				QuakeNotifier quakeNotifier = new QuakeNotifier(this);
@@ -81,21 +76,23 @@ public class RefreshService extends IntentService {
 		refresh();
 	}
 
-	private static void setLocation(Context context, QuakePrefs quakePrefs) {
-		LocationManager lm = (LocationManager) context
-				.getSystemService(Context.LOCATION_SERVICE);
-		String name = lm.getBestProvider(new Criteria(), true);
-		if (name == null) {
-			Log.e("quakealert", "no best location provider returned");
-			location = null;
-			return;
+	private static void setLocation(Context context, Prefs quakePrefs) {
+		if (quakePrefs.isUseLocation()) {
+			LocationManager lm = (LocationManager) context
+					.getSystemService(Context.LOCATION_SERVICE);
+			String name = lm.getBestProvider(new Criteria(), true);
+			if (name == null) {
+				Log.e("quakealert", "no best location provider returned");
+				location = null;
+				return;
+			}
+			location = lm.getLastKnownLocation(name);
 		}
-		location = lm.getLastKnownLocation(name);
 	}
 
 	private static ArrayList<Quake> getQuakeMatches(Context context,
 			ArrayList<Quake> quakeList) {
-		QuakePrefs prefs = new QuakePrefs(context);
+		Prefs prefs = new Prefs(context);
 
 		if (quakeList == null || quakeList.size() == 0) {
 			return null;

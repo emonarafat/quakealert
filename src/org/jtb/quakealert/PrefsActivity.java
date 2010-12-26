@@ -32,9 +32,10 @@ public class PrefsActivity extends PreferenceActivity implements
 	private CheckBoxPreference mFlashPreference;
 	private CheckBoxPreference mBootStartPreference;
 	private CheckBoxPreference mNotificationsPreference;
+	private CheckBoxPreference mUseLocationPreference;
 
 	private AlertDialog mIntervalWarnDialog;
-	private QuakePrefs mQuakePrefs;
+	private Prefs mQuakePrefs;
 
 	private void setRangeEntries() {
 		if (mQuakePrefs.getUnits() == Units.METRIC) {
@@ -46,7 +47,7 @@ public class PrefsActivity extends PreferenceActivity implements
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		mQuakePrefs = new QuakePrefs(this);
+		mQuakePrefs = new Prefs(this);
 		setTheme(mQuakePrefs.getTheme().getId());
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.layout.prefs);
@@ -75,15 +76,16 @@ public class PrefsActivity extends PreferenceActivity implements
 		};
 		mIntervalPreference.setEnabled(mQuakePrefs.isNotificationsEnabled());
 		mIntervalPreference.setOnPreferenceClickListener(intervalWarnListener);
-		
+
 		mAlertPreference = (CheckBoxPreference) findPreference("notificationAlert");
 		mAlertSoundPreference = (RingtonePreference) findPreference("notificationAlertSound");
 		mVibratePreference = (CheckBoxPreference) findPreference("notificationVibrate");
 		mFlashPreference = (CheckBoxPreference) findPreference("notificationFlash");
 		mBootStartPreference = (CheckBoxPreference) findPreference("bootStart");
 		mUnitsPreference = (ListPreference) findPreference("units");
-		mNotificationsPreference = (CheckBoxPreference) findPreference("notificationsEnabled");		
-		
+		mNotificationsPreference = (CheckBoxPreference) findPreference("notificationsEnabled");
+		mUseLocationPreference = (CheckBoxPreference) findPreference("useLocation");
+
 		setNotificationsEnabled(mQuakePrefs.isNotificationsEnabled());
 	}
 
@@ -93,34 +95,36 @@ public class PrefsActivity extends PreferenceActivity implements
 		mAlertPreference.setEnabled(enabled);
 		mAlertSoundPreference.setEnabled(enabled);
 		mVibratePreference.setEnabled(enabled);
-		mBootStartPreference.setEnabled(enabled);		
+		mBootStartPreference.setEnabled(enabled);
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
 
 		setRangeEntries();
-		
+
 		setRangeTitle();
 		setMagnitudeTitle();
 		setUnitsTitle();
 		setIntervalTitle();
 		setThemeTitle();
 		setMaxAgeTitle();
-		
+
 		getPreferenceScreen().getSharedPreferences()
 				.registerOnSharedPreferenceChangeListener(this);
 	}
-	
+
 	private void setRangeTitle() {
 		int range = mQuakePrefs.getRange();
-		mRangePreference.setTitle("Range? (" + new Distance(range).toString(mQuakePrefs) + ")");
+		mRangePreference.setTitle("Range? ("
+				+ new Distance(range).toString(mQuakePrefs) + ")");
 	}
 
 	private void setMagnitudeTitle() {
 		Magnitude magnitude = mQuakePrefs.getMagnitude();
-		mMagnitudePreference.setTitle("Magnitude? (" + magnitude.getTitle(this) + ")");
+		mMagnitudePreference.setTitle("Magnitude? (" + magnitude.getTitle(this)
+				+ ")");
 	}
 
 	private void setUnitsTitle() {
@@ -147,10 +151,10 @@ public class PrefsActivity extends PreferenceActivity implements
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
 		Log.d("quakealert", "preference changed: " + key);
-		
+
 		if (key.equals("range")) {
 			setRangeTitle();
-			setResult(CHANGED_RESULT);		
+			setResult(CHANGED_RESULT);
 		} else if (key.equals("magnitude")) {
 			setMagnitudeTitle();
 			setResult(CHANGED_RESULT);
@@ -173,15 +177,18 @@ public class PrefsActivity extends PreferenceActivity implements
 			if (mQuakePrefs.isNotificationsEnabled()) {
 				setNotificationsEnabled(true);
 				sendBroadcast(new Intent("schedule", null, mThis,
-						RefreshReceiver.class));				
+						RefreshReceiver.class));
 			} else {
 				setNotificationsEnabled(false);
 				sendBroadcast(new Intent("cancel", null, mThis,
-						RefreshReceiver.class));				
+						RefreshReceiver.class));
 			}
+		} else if (key.equals("useLocation")) {
+			if (!mQuakePrefs.isUseLocation()) {
+				RefreshService.location = null;				
+			}
+			setResult(CHANGED_RESULT);
+			
 		}
-		
-		
 	}
-
 }

@@ -24,8 +24,9 @@ public class Quakes {
 		try {
 			URL u = new URL(QUAKES_URL);
 			HttpURLConnection uc = (HttpURLConnection) u.openConnection();
+			uc.setConnectTimeout(60 * 1000); // 60 seconds
 			uc.setReadTimeout(60 * 1000); // 60 seconds
-
+			
 			if (uc.getResponseCode() != 200) {
 				Log.e("quakealert",
 						"URL read failed, response code: "

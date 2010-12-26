@@ -23,22 +23,46 @@ public class LocationService extends Service {
 
 	@Override
 	public void onStart(Intent intent, final int startId) {
+		super.onStart(intent, startId);
 		handleCommand(intent, startId);
 	}
 
 	private void handleCommand(Intent intent, final int startId) {
-		super.onStart(intent, startId);
+		final Intent broadcastIntent = intent
+				.getParcelableExtra("broadcastIntent");
 
+		Prefs prefs = new Prefs(this);
+		// if we're not using location, just send the
+		// broadcast intent
+		if (!prefs.isUseLocation()) {
+			Log.d("quakealert", "location service, not using location");
+			sendBroadcast(broadcastIntent);
+			return;
+		}
+
+		final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		Location l = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		if (l != null) {
+			// we have a last known location, go ahead and send
+			// the passed broadcast intent
+			Log.d("quakealert", "location service, got last known location: " + l);
+			sendBroadcast(broadcastIntent);
+			return;
+
+		}
+
+		// we don't have a last known location, wait for the current location
+		Log.d("quakealert", "location service, could not get last known location");
 		long timeout = intent.getLongExtra("timeout", 1000 * 60 * 2);
-		final Intent broadcastIntent = intent.getParcelableExtra("broadcastIntent");
-		
 		final Timer timer = new Timer();
 
 		final LocationListener locationListener = new LocationListener() {
 			public void onLocationChanged(Location location) {
-				Log.d("quakealert", "location service, location changed: " + location);
+				Log.d("quakealert", "location service, got location changed: "
+						+ location);
+				lm.removeUpdates(this);
 				timer.cancel();
-				sendBroadcast(broadcastIntent);				
+				sendBroadcast(broadcastIntent);
 				stopSelfResult(startId);
 			}
 
@@ -52,21 +76,23 @@ public class LocationService extends Service {
 					Bundle extras) {
 			}
 		};
-		
-		final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
 		lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0,
 				locationListener);
-		
+
+		// create a timer to abort waiting for the location after the
+		// passed timeout
 		TimerTask tt = new TimerTask() {
 
 			@Override
 			public void run() {
-				Log.d("quakealert", "location serivce, could not get location, aborting");
+				Log.d("quakealert",
+						"location serivce, did not get location changed");
 				lm.removeUpdates(locationListener);
-				sendBroadcast(broadcastIntent);				
+				sendBroadcast(broadcastIntent);
 				stopSelfResult(startId);
 			}
-			
+
 		};
 		timer.schedule(tt, timeout); // 2 minutes
 	}

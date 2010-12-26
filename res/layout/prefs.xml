@@ -24,6 +24,11 @@
 			android:key="theme" android:defaultValue="LIGHT" android:entries="@array/theme_entries"
 			android:entryValues="@array/theme_values" />
 	</PreferenceCategory>
+	<PreferenceCategory android:title="Location">
+		<CheckBoxPreference android:title="Use Location?"
+			android:summary="Attempt to get your location, to display distance to quakes?"
+			android:key="useLocation" android:defaultValue="true" />
+	</PreferenceCategory>
 	<PreferenceCategory android:title="Notifications">
 		<CheckBoxPreference android:title="Send Notifications?"
 			android:summary="Send notifications when quakes occur that match your criteria."

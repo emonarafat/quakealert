@@ -14,14 +14,14 @@ import android.widget.TextView;
 public class QuakeAdapter extends ArrayAdapter<Quake> {
 	private List<Quake> quakes;
 	private Location location;
-	private QuakePrefs quakePrefs;
+	private Prefs quakePrefs;
 	private LayoutInflater inflater;
 
 	QuakeAdapter(Activity context, List<Quake> quakes) {
 		super(context, R.layout.quake, quakes);
 		this.quakes = quakes;
 
-		quakePrefs = new QuakePrefs(context);
+		quakePrefs = new Prefs(context);
 		this.inflater = context.getLayoutInflater();
 	}
 

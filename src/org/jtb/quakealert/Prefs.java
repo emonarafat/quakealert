@@ -7,10 +7,10 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-public class QuakePrefs {
+public class Prefs {
 	private Context context = null;
 
-	public QuakePrefs(Context context) {
+	public Prefs(Context context) {
 		this.context = context;
 	}
 
@@ -190,5 +190,9 @@ public class QuakePrefs {
 	
 	public void setLastUpdate() {
 		setLong("lastUpdate", System.currentTimeMillis());
+	}
+	
+	public boolean isUseLocation() {
+		return getBoolean("useLocation", true);
 	}
 }
