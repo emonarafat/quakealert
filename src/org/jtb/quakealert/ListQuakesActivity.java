@@ -180,11 +180,10 @@ public class ListQuakesActivity extends Activity {
 			return;
 		}
 
-		showDialog(LOCATION_DIALOG);
 		final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
 		Location l = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 		if (l == null) {
+			showDialog(LOCATION_DIALOG);			
 			lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0,
 					mLocationListener);
 		} else {

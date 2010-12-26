@@ -85,8 +85,6 @@ public class PrefsActivity extends PreferenceActivity implements
 		mUnitsPreference = (ListPreference) findPreference("units");
 		mNotificationsPreference = (CheckBoxPreference) findPreference("notificationsEnabled");
 		mUseLocationPreference = (CheckBoxPreference) findPreference("useLocation");
-
-		setNotificationsEnabled(mQuakePrefs.isNotificationsEnabled());
 	}
 
 	private void setNotificationsEnabled(boolean enabled) {
@@ -96,6 +94,10 @@ public class PrefsActivity extends PreferenceActivity implements
 		mAlertSoundPreference.setEnabled(enabled);
 		mVibratePreference.setEnabled(enabled);
 		mBootStartPreference.setEnabled(enabled);
+	}
+
+	private void setRangeEnabled(boolean enabled) {
+		mRangePreference.setEnabled(enabled);
 	}
 
 	@Override
@@ -113,12 +115,28 @@ public class PrefsActivity extends PreferenceActivity implements
 
 		getPreferenceScreen().getSharedPreferences()
 				.registerOnSharedPreferenceChangeListener(this);
+
+		setNotificationsEnabled(mQuakePrefs.isNotificationsEnabled());
+		setRangeEnabled(mQuakePrefs.isUseLocation());
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+
+		getPreferenceScreen().getSharedPreferences()
+				.unregisterOnSharedPreferenceChangeListener(this);
 	}
 
 	private void setRangeTitle() {
 		int range = mQuakePrefs.getRange();
 		mRangePreference.setTitle("Range? ("
 				+ new Distance(range).toString(mQuakePrefs) + ")");
+		if (mQuakePrefs.isUseLocation()) {
+			mRangePreference.setSummary(R.string.range_pref_summary);
+		} else {
+			mRangePreference.setSummary(R.string.range_pref_summary_disabled);			
+		}
 	}
 
 	private void setMagnitudeTitle() {
@@ -185,10 +203,12 @@ public class PrefsActivity extends PreferenceActivity implements
 			}
 		} else if (key.equals("useLocation")) {
 			if (!mQuakePrefs.isUseLocation()) {
-				RefreshService.location = null;				
+				RefreshService.location = null;
 			}
+			setRangeEnabled(mQuakePrefs.isUseLocation());
+			setRangeTitle();
 			setResult(CHANGED_RESULT);
-			
+
 		}
 	}
 }

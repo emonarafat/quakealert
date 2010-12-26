@@ -2,7 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 	<PreferenceCategory android:title="Display">
 		<ListPreference android:title="Range?"
-			android:summary="Quakes within this range will be reported."
+			android:summary="@string/range_pref_summary"
 			android:key="range" android:defaultValue="-1" android:entryValues="@array/range_values" />
 		<ListPreference android:title="Magnitude?"
 			android:summary="Quakes with at least this magnitude will be reported."

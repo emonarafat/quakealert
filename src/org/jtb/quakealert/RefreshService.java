@@ -25,7 +25,10 @@ public class RefreshService extends IntentService {
 			setLocation(this, quakePrefs);
 
 			int range = quakePrefs.getRange();
-			if (location == null && range != -1) {
+			// if we can't get a location, and the range isn't already set to show all,
+			// and we haven't explicitly disabled using the location
+			// then set the range to show all
+			if (location == null && range != -1 && quakePrefs.isUseLocation()) {
 				Log.d("quakealert", "location unknown, showing all");
 				quakePrefs.setRange(-1);
 				sendBroadcast(new Intent("showUnknownLocationMessage"));

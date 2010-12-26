@@ -22,7 +22,7 @@ public class ListReceiver extends BroadcastReceiver {
 		} else if (intent.getAction().equals("dismissRefreshDialog")) {
 			handler.sendEmptyMessage(ListQuakesActivity.REFRESH_HIDE_WHAT);
 		} else if (intent.getAction().equals("showUnknownLocationMessage")) {
-			Toast.makeText(context, "Unknown location, showing all.",
+			Toast.makeText(context, "Unknown location, range set to show all.",
 					Toast.LENGTH_LONG).show();
 		} else if (intent.getAction().equals("showNetworkErrorDialog")) {
 			handler.sendEmptyMessage(ListQuakesActivity.NETWORK_ERROR_SHOW_WHAT);

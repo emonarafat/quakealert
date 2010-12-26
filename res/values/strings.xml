@@ -21,4 +21,6 @@
 	<string name="interval_warn">Quake Alert! uses &quot;inexact&quot; intervals to
 		conserve battery life. This means that refreshes may not occur exactly
 		when you expect.</string>
+<string name="range_pref_summary">Quakes within this range of your current location will be reported.</string>
+<string name="range_pref_summary_disabled">Disabled, location is disabled.</string>
 </resources>
