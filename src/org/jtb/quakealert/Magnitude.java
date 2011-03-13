@@ -35,6 +35,10 @@ public enum Magnitude {
 	}
 
 	public static Magnitude valueOf(float f) {
-		return byValue.get(f);
+		Magnitude m = byValue.get(f);
+		if (m == null) {
+			throw new IllegalArgumentException(f + " has no value");
+		}
+		return m;
 	}
 }

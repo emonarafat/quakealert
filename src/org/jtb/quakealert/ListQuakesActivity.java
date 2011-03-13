@@ -162,8 +162,6 @@ public class ListQuakesActivity extends Activity {
 					.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 			quakePrefs.setNotificationAlertSound(defaultUri);
 		}
-
-		getLocation();
 	}
 
 	@Override
@@ -183,7 +181,7 @@ public class ListQuakesActivity extends Activity {
 		final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		Location l = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 		if (l == null) {
-			showDialog(LOCATION_DIALOG);			
+			showDialog(LOCATION_DIALOG);
 			lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0,
 					mLocationListener);
 		} else {
@@ -194,15 +192,19 @@ public class ListQuakesActivity extends Activity {
 
 	@Override
 	public void onPause() {
+		Log.d("quakealert", "paused");
+
 		super.onPause();
+
 		unregisterReceiver(listUpdateReceiver);
 		final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		lm.removeUpdates(mLocationListener);
-		Log.d("quakealert", "paused");
 	}
 
 	@Override
 	public void onResume() {
+		Log.d("quakealert", "resumed");
+
 		super.onResume();
 
 		registerReceiver(listUpdateReceiver, new IntentFilter("updateList"));
@@ -215,7 +217,7 @@ public class ListQuakesActivity extends Activity {
 		registerReceiver(listUpdateReceiver, new IntentFilter(
 				"showNetworkErrorDialog"));
 
-		Log.d("quakealert", "resumed");
+		getLocation();
 	}
 
 	public void updateList() {
@@ -386,7 +388,14 @@ public class ListQuakesActivity extends Activity {
 			String m = quakePrefs.getString("magnitude", null);
 			if (m != null && m.contains(".")) {
 				float f = Float.parseFloat(m);
-				Magnitude mag = Magnitude.valueOf(f);
+				Magnitude mag;
+
+				try {
+					mag = Magnitude.valueOf(f);
+				} catch (IllegalArgumentException e) {
+					mag = Magnitude.M3;
+				}
+				
 				quakePrefs.setMagnitude(mag);
 			}
 

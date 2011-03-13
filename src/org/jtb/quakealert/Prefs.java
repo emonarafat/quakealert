@@ -94,16 +94,19 @@ public class Prefs {
 		setBoolean(warnId, warn);
 	}
 
-
 	public Interval getInterval() {
 		String is = getString("interval", "HOUR");
-		Interval i = Interval.valueOf(is);
-		if (i != null) {
-			return i;
-		} 
+		Interval i;
+
+		try {
+			i = Interval.valueOf(is);
+		} catch (IllegalArgumentException e) {
+			i = Interval.HOUR;
+			setInterval(i);
+		}
+
 		Log.e("quakealert", "invalid interval found: " + is);
-		setInterval(Interval.HOUR);
-		return Interval.HOUR;
+		return i;
 	}
 
 	public void setInterval(Interval i) {
@@ -119,11 +122,23 @@ public class Prefs {
 	}
 
 	public Magnitude getMagnitude() {
-		String m = getString("magnitude", Magnitude.M3.toString());
-		return Magnitude.valueOf(m);
+		String s = getString("magnitude", Magnitude.M3.toString());
+		Magnitude m;
+
+		try {
+			m = Magnitude.valueOf(s);
+		} catch (IllegalArgumentException e) {
+			m = Magnitude.M3;
+			setMagnitude(m);
+		}
+
+		return m;
 	}
 
 	public void setMagnitude(Magnitude mag) {
+		if (mag == null) {
+			mag = Magnitude.M3;
+		}
 		setString("magnitude", mag.toString());
 	}
 
@@ -168,14 +183,14 @@ public class Prefs {
 			return null;
 		}
 		Uri sound = Uri.parse(s);
-		
+
 		return sound;
-	}	
-	
+	}
+
 	public void setNotificationAlertSound(Uri soundUri) {
 		setString("notificationAlertSound", soundUri.toString());
 	}
-	
+
 	public boolean isZoomToFit() {
 		return getBoolean("zoomToFit", false);
 	}
@@ -183,15 +198,15 @@ public class Prefs {
 	public boolean isBootStart() {
 		return getBoolean("bootStart", false);
 	}
-	
+
 	public long getLastUpdate() {
 		return getLong("lastUpdate", -1);
 	}
-	
+
 	public void setLastUpdate() {
 		setLong("lastUpdate", System.currentTimeMillis());
 	}
-	
+
 	public boolean isUseLocation() {
 		return getBoolean("useLocation", true);
 	}
