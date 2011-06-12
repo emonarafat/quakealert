@@ -28,6 +28,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout;
@@ -37,7 +38,6 @@ public class ListQuakesActivity extends Activity {
 	private static final String HELP_URL = "http://code.google.com/p/quakealert/wiki/Help";
 	private static final String REPORT_URL = "http://code.google.com/p/quakealert/issues/list";
 
-	private static final int LOCATION_CANCEL_WHAT = 0;
 	static final int REFRESH_HIDE_WHAT = 1;
 	static final int REFRESH_SHOW_WHAT = 2;
 	static final int UPDATE_LIST_WHAT = 3;
@@ -50,13 +50,12 @@ public class ListQuakesActivity extends Activity {
 	private static final int PREFS_REQUEST = 0;
 
 	static final int REFRESH_DIALOG = 0;
-	static final int LOCATION_DIALOG = 1;
+	static final int UNKNOWN_LOCATION_DIALOG = 1;
 	static final int NETWORK_ERROR_DIALOG = 2;
 	static final int WARN_DIALOG = 3;
 
 	private AlertDialog mServiceWarnDialog;
 	private ProgressDialog mRefreshDialog;
-	private ProgressDialog mLocationDialog;
 	private AlertDialog mNetworkErrorDialog;
 	private AlertDialog mListClickDialog;
 
@@ -66,21 +65,11 @@ public class ListQuakesActivity extends Activity {
 	private Prefs quakePrefs;
 	private QuakeAdapter quakeAdapter;
 	private List<Quake> quakes = new ArrayList<Quake>();
-	private LocationListener mLocationListener;
 
 	Handler mHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
-			case LOCATION_CANCEL_WHAT:
-				removeDialog(LOCATION_DIALOG);
-				mLocationDialog = null;
-
-				final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-				lm.removeUpdates(mLocationListener);
-				sendBroadcast(new Intent("refresh", null,
-						ListQuakesActivity.this, RefreshReceiver.class));
-				break;
 			case REFRESH_SHOW_WHAT:
 				showDialog(REFRESH_DIALOG);
 				break;
@@ -135,23 +124,6 @@ public class ListQuakesActivity extends Activity {
 					RefreshReceiver.class));
 		}
 
-		mLocationListener = new LocationListener() {
-			public void onLocationChanged(Location location) {
-				Log.d("quakealert", "list, got location changed: " + location);
-				mHandler.sendEmptyMessage(LOCATION_CANCEL_WHAT);
-			}
-
-			public void onProviderDisabled(String provider) {
-			}
-
-			public void onProviderEnabled(String provider) {
-			}
-
-			public void onStatusChanged(String provider, int status,
-					Bundle extras) {
-			}
-		};
-
 		if (quakePrefs.isWarn("serviceWarn")) {
 			showDialog(WARN_DIALOG);
 		}
@@ -162,34 +134,20 @@ public class ListQuakesActivity extends Activity {
 					.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 			quakePrefs.setNotificationAlertSound(defaultUri);
 		}
+		
+		refresh();
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		lm.removeUpdates(mLocationListener);
 	}
 
-	private void getLocation() {
-		if (!quakePrefs.isUseLocation()) {
+	private void refresh() {
 			sendBroadcast(new Intent("refresh", null, ListQuakesActivity.this,
 					RefreshReceiver.class));
-			return;
-		}
-
-		final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		Location l = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-		if (l == null) {
-			showDialog(LOCATION_DIALOG);
-			lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0,
-					mLocationListener);
-		} else {
-			sendBroadcast(new Intent("refresh", null, ListQuakesActivity.this,
-					RefreshReceiver.class));
-		}
 	}
-
+	
 	@Override
 	public void onPause() {
 		Log.d("quakealert", "paused");
@@ -197,8 +155,6 @@ public class ListQuakesActivity extends Activity {
 		super.onPause();
 
 		unregisterReceiver(listUpdateReceiver);
-		final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		lm.removeUpdates(mLocationListener);
 	}
 
 	@Override
@@ -216,8 +172,6 @@ public class ListQuakesActivity extends Activity {
 				"showUnknownLocationMessage"));
 		registerReceiver(listUpdateReceiver, new IntentFilter(
 				"showNetworkErrorDialog"));
-
-		getLocation();
 	}
 
 	public void updateList() {
@@ -261,7 +215,7 @@ public class ListQuakesActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.refesh_item:
-			getLocation();
+			refresh();
 			return true;
 		case R.id.preferences_item:
 			Intent prefsActivity = new Intent(this, PrefsActivity.class);
@@ -286,7 +240,7 @@ public class ListQuakesActivity extends Activity {
 		case PREFS_REQUEST:
 			switch (resultCode) {
 			case PrefsActivity.CHANGED_RESULT:
-				getLocation();
+				refresh();
 				break;
 			case PrefsActivity.RESET_RESULT:
 				finish();
@@ -306,17 +260,6 @@ public class ListQuakesActivity extends Activity {
 				mRefreshDialog.setCancelable(false);
 			}
 			return mRefreshDialog;
-		case LOCATION_DIALOG:
-			if (mLocationDialog == null) {
-				mLocationDialog = new ProgressDialog(this);
-				mLocationDialog
-						.setMessage("Getting location, please wait ...\n\nEnsure that you have wireless location services enabled.\n\nIf you cancel, quake distances may not be accurate / shown.");
-				mLocationDialog.setIndeterminate(true);
-				mLocationDialog.setCancelable(false);
-				mLocationDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Cancel",
-						mHandler.obtainMessage(LOCATION_CANCEL_WHAT));
-			}
-			return mLocationDialog;
 		case NETWORK_ERROR_DIALOG:
 			if (mNetworkErrorDialog == null) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -395,7 +338,7 @@ public class ListQuakesActivity extends Activity {
 				} catch (IllegalArgumentException e) {
 					mag = Magnitude.M3;
 				}
-				
+
 				quakePrefs.setMagnitude(mag);
 			}
 

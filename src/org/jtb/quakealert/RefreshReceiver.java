@@ -14,16 +14,7 @@ public class RefreshReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		Log.d("quakealert", "refresh receiver, action: " + intent.getAction());
 
-		if (intent.getAction().equals("location")) {
-			Lock.acquire(context);
-			Intent broadcastIntent = new Intent("refresh", null, context,
-					RefreshReceiver.class);
-			Intent locationIntent = new Intent(context, LocationService.class);
-			locationIntent.putExtra("timeout", (long) (1000 * 60 * 2)); // 2
-																		// minutes
-			locationIntent.putExtra("broadcastIntent", broadcastIntent);
-			context.startService(locationIntent);
-		} else if (intent.getAction().equals("refresh")) {
+		if (intent.getAction().equals("refresh")) {
 			context.startService(new Intent(context, RefreshService.class));
 		} else if (intent.getAction().equals("schedule")) {
 			schedule(context);
@@ -35,7 +26,7 @@ public class RefreshReceiver extends BroadcastReceiver {
 	private void schedule(Context context) {
 		AlarmManager mgr = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
-		Intent i = new Intent("location", null, context, RefreshReceiver.class);
+		Intent i = new Intent("refresh", null, context, RefreshReceiver.class);
 		PendingIntent pi = PendingIntent.getBroadcast(context, 0, i,
 				PendingIntent.FLAG_UPDATE_CURRENT);
 		mgr.cancel(pi);
@@ -50,7 +41,7 @@ public class RefreshReceiver extends BroadcastReceiver {
 	private void cancel(Context context) {
 		AlarmManager mgr = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
-		Intent i = new Intent("location", null, context, RefreshReceiver.class);
+		Intent i = new Intent("refresh", null, context, RefreshReceiver.class);
 		PendingIntent pi = PendingIntent.getBroadcast(context, 0, i,
 				PendingIntent.FLAG_CANCEL_CURRENT);
 		mgr.cancel(pi);

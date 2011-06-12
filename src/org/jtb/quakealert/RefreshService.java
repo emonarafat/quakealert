@@ -25,12 +25,12 @@ public class RefreshService extends IntentService {
 			setLocation(this, quakePrefs);
 
 			int range = quakePrefs.getRange();
-			// if we can't get a location, and the range isn't already set to show all,
+			// if we can't get a location, and the range isn't already set to
+			// show all,
 			// and we haven't explicitly disabled using the location
 			// then set the range to show all
 			if (location == null && range != -1 && quakePrefs.isUseLocation()) {
-				Log.d("quakealert", "location unknown, showing all");
-				quakePrefs.setRange(-1);
+				Log.w("quakealert", "location unknown, showing all");
 				sendBroadcast(new Intent("showUnknownLocationMessage"));
 			}
 
@@ -38,6 +38,8 @@ public class RefreshService extends IntentService {
 			quakes.update(lastUpdate);
 
 			ArrayList<Quake> quakeList = quakes.get();
+			Log.d("quakealert", "raw quake list size: " + quakeList.size());
+			
 			if (quakeList == null) {
 				Log.e("quakealert",
 						"quake list empty (network error?), aborting refresh");
@@ -83,13 +85,17 @@ public class RefreshService extends IntentService {
 		if (quakePrefs.isUseLocation()) {
 			LocationManager lm = (LocationManager) context
 					.getSystemService(Context.LOCATION_SERVICE);
-			String name = lm.getBestProvider(new Criteria(), true);
-			if (name == null) {
-				Log.e("quakealert", "no best location provider returned");
-				location = null;
-				return;
+			
+			location = null;
+			for (String providerName : lm.getProviders(true)) {
+				location = lm.getLastKnownLocation(providerName);
+				if (location != null) {
+					return;
+				}
 			}
-			location = lm.getLastKnownLocation(name);
+			
+			Log.w("quakealert", "could to find location");
+			return;
 		}
 	}
 
@@ -103,9 +109,6 @@ public class RefreshService extends IntentService {
 
 		int range = prefs.getRange();
 		float magnitude = prefs.getMagnitude().getValue();
-		if (location == null && range != -1) {
-			return null;
-		}
 
 		ArrayList<Quake> matchQuakes = new ArrayList<Quake>();
 		newCount = 0;

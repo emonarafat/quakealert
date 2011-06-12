@@ -146,9 +146,9 @@ public class Quake {
 		// matches location?
 		if (range > 0) {
 			float distance = getDistance(location);
-			// Log.d("quakealert", "range: " + range +
-			// ", distance: "
-			// + distance);
+			 Log.d("quakealert", "range: " + range +
+			 ", distance: "
+			 + distance);
 			if (distance > range) {
 				return false;
 			}
