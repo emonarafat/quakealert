@@ -30,11 +30,12 @@ public class WarnDialogBuilder extends AlertDialog.Builder {
 		layout.setMinimumHeight(180);
 		layout.setMinimumWidth(240);
 		setView(layout);
-		setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		});
+		setNeutralButton(android.R.string.ok,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
 
 		CheckBox cb = (CheckBox) layout.findViewById(R.id.warn_check);
 		cb.setChecked(false);

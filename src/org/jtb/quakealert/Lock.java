@@ -35,7 +35,6 @@ public class Lock {
 		} else {
 			if (lock.isHeld()) {
 				lock.release();
-				lock = null;
 				Log.d("quakealert", "wake lock released");
 			} else {
 				Log.w("quakealert",

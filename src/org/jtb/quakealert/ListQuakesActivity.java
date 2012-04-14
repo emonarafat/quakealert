@@ -22,6 +22,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.Menu;
@@ -134,7 +135,7 @@ public class ListQuakesActivity extends Activity {
 					.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 			quakePrefs.setNotificationAlertSound(defaultUri);
 		}
-		
+
 		refresh();
 	}
 
@@ -144,10 +145,10 @@ public class ListQuakesActivity extends Activity {
 	}
 
 	private void refresh() {
-			sendBroadcast(new Intent("refresh", null, ListQuakesActivity.this,
-					RefreshReceiver.class));
+		sendBroadcast(new Intent("refresh", null, ListQuakesActivity.this,
+				RefreshReceiver.class));
 	}
-	
+
 	@Override
 	public void onPause() {
 		Log.d("quakealert", "paused");
@@ -202,6 +203,22 @@ public class ListQuakesActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.list_menu, menu);
+		
+		MenuItem mi;
+		
+		mi = menu.getItem(0);
+		MenuItemCompat.setShowAsAction(mi,
+				MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+		mi = menu.getItem(1);
+		MenuItemCompat.setShowAsAction(mi,
+				MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+		mi = menu.getItem(2);
+		MenuItemCompat.setShowAsAction(mi,
+				MenuItemCompat.SHOW_AS_ACTION_NEVER);
+		mi = menu.getItem(3);
+		MenuItemCompat.setShowAsAction(mi,
+				MenuItemCompat.SHOW_AS_ACTION_NEVER);
+	
 		return true;
 	}
 
@@ -265,7 +282,7 @@ public class ListQuakesActivity extends Activity {
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle("Network Error");
 				builder.setMessage("Could not retrieve recent quakes.\n\nEnsure that you have a network connection (mobile or wifi).");
-				builder.setNeutralButton(R.string.ok,
+				builder.setNeutralButton(android.R.string.ok,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,
 									int which) {

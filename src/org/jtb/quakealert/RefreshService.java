@@ -36,17 +36,16 @@ public class RefreshService extends IntentService {
 
 			long lastUpdate = quakePrefs.getLastUpdate();
 			quakes.update(lastUpdate);
-
 			ArrayList<Quake> quakeList = quakes.get();
-			Log.d("quakealert", "raw quake list size: " + quakeList.size());
-			
+
 			if (quakeList == null) {
 				Log.e("quakealert",
 						"quake list empty (network error?), aborting refresh");
 				sendBroadcast(new Intent("showNetworkErrorDialog"));
 				return;
 			}
-
+			Log.d("quakealert", "raw quake list size: " + quakeList.size());
+			
 			matchQuakes = getQuakeMatches(this, quakeList);
 			if (matchQuakes == null) {
 				Log.d("quakealert", "no matches");

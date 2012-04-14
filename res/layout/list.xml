@@ -1,23 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-	android:orientation="vertical" android:layout_width="fill_parent"
-	android:layout_height="fill_parent" android:background="?background">
-	<LinearLayout android:id="@+id/no_quakes_layout"
-		android:cacheColorHint="?cacheColorHint" android:paddingLeft="16dp"
-		android:paddingRight="16dp" android:paddingTop="16dp"
-		android:paddingBottom="16dp" android:layout_marginLeft="32dp"
-		android:layout_marginRight="32dp" android:layout_marginTop="32dp"
-		android:layout_marginBottom="32dp" android:gravity="center"
-		android:orientation="vertical" android:layout_width="fill_parent"
-		android:layout_height="fill_parent">
-		<TextView android:text="@string/no_quakes_summary"
-			android:textSize="18dp" android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:gravity="center" />
-		<TextView android:text="@string/no_quakes_good"
-			android:textSize="16dp" android:layout_width="fill_parent"
-			android:layout_height="wrap_content" android:gravity="center" />
-	</LinearLayout>
-	<ListView android:id="@+id/list" android:visibility="gone"
-		android:cacheColorHint="?cacheColorHint" android:layout_width="fill_parent"
-		android:layout_height="fill_parent" />
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="?background"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/no_quakes_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_marginBottom="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        android:layout_marginTop="32dp"
+        android:cacheColorHint="?cacheColorHint"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingBottom="16dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="16dp" >
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/no_quakes_summary"
+            android:textSize="18dp" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/no_quakes_good"
+            android:textSize="16dp" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:cacheColorHint="?cacheColorHint"
+        android:visibility="gone" />
+
 </LinearLayout>

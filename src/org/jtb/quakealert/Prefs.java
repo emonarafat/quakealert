@@ -101,11 +101,11 @@ public class Prefs {
 		try {
 			i = Interval.valueOf(is);
 		} catch (IllegalArgumentException e) {
+			Log.e("quakealert", "invalid interval found: " + is);
 			i = Interval.HOUR;
 			setInterval(i);
 		}
 
-		Log.e("quakealert", "invalid interval found: " + is);
 		return i;
 	}
 
