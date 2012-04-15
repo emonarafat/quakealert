@@ -13,7 +13,8 @@ public class Lock {
 			PowerManager mgr = (PowerManager) context
 					.getSystemService(Context.POWER_SERVICE);
 
-			lock = mgr.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "org.jtb.quakealert.lock");
+			lock = mgr.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+					"org.jtb.quakealert.lock");
 			lock.setReferenceCounted(true);
 		}
 		return lock;
@@ -21,17 +22,13 @@ public class Lock {
 
 	public static synchronized void acquire(Context context) {
 		WakeLock wakeLock = getLock(context);
-		if (!wakeLock.isHeld()) {
-			wakeLock.acquire();
-			Log.d("quakealert", "wake lock acquired");
-		}
+		wakeLock.acquire();
+		Log.d("quakealert", "wake lock acquired");
 	}
 
 	public static synchronized void release() {
 		if (lock == null) {
-			Log
-					.w("quakealert",
-							"release attempted, but wake lock was null");
+			Log.w("quakealert", "release attempted, but wake lock was null");
 		} else {
 			if (lock.isHeld()) {
 				lock.release();

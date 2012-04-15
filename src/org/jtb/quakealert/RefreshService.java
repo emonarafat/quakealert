@@ -19,54 +19,49 @@ public class RefreshService extends IntentService {
 
 	private void refresh() {
 		Log.d("quakealert", "refreshing");
-		try {
-			Prefs quakePrefs = new Prefs(this);
-			sendBroadcast(new Intent("showRefreshDialog"));
-			setLocation(this, quakePrefs);
+		Prefs quakePrefs = new Prefs(this);
+		sendBroadcast(new Intent("showRefreshDialog"));
+		setLocation(this, quakePrefs);
 
-			int range = quakePrefs.getRange();
-			// if we can't get a location, and the range isn't already set to
-			// show all,
-			// and we haven't explicitly disabled using the location
-			// then set the range to show all
-			if (location == null && range != -1 && quakePrefs.isUseLocation()) {
-				Log.w("quakealert", "location unknown, showing all");
-				sendBroadcast(new Intent("showUnknownLocationMessage"));
-			}
-
-			long lastUpdate = quakePrefs.getLastUpdate();
-			quakes.update(lastUpdate);
-			ArrayList<Quake> quakeList = quakes.get();
-
-			if (quakeList == null) {
-				Log.e("quakealert",
-						"quake list empty (network error?), aborting refresh");
-				sendBroadcast(new Intent("showNetworkErrorDialog"));
-				return;
-			}
-			Log.d("quakealert", "raw quake list size: " + quakeList.size());
-			
-			matchQuakes = getQuakeMatches(this, quakeList);
-			if (matchQuakes == null) {
-				Log.d("quakealert", "no matches");
-				return;
-			}
-
-			int mqsSize = matchQuakes.size();
-			Log.d("quakealert", mqsSize + " matches");
-
-			Collections.sort(matchQuakes, new Quake.ListComparator());
-
-			if (newCount > 0 && quakePrefs.isNotificationsEnabled()) {
-				QuakeNotifier quakeNotifier = new QuakeNotifier(this);
-				quakeNotifier.alert();
-			}
-
-			sendBroadcast(new Intent("updateList"));
-		} finally {
-			sendBroadcast(new Intent("dismissRefreshDialog"));
-			Lock.release();
+		int range = quakePrefs.getRange();
+		// if we can't get a location, and the range isn't already set to
+		// show all,
+		// and we haven't explicitly disabled using the location
+		// then set the range to show all
+		if (location == null && range != -1 && quakePrefs.isUseLocation()) {
+			Log.w("quakealert", "location unknown, showing all");
+			sendBroadcast(new Intent("showUnknownLocationMessage"));
 		}
+
+		long lastUpdate = quakePrefs.getLastUpdate();
+		quakes.update(lastUpdate);
+		ArrayList<Quake> quakeList = quakes.get();
+
+		if (quakeList == null) {
+			Log.e("quakealert",
+					"quake list empty (network error?), aborting refresh");
+			sendBroadcast(new Intent("showNetworkErrorDialog"));
+			return;
+		}
+		Log.d("quakealert", "raw quake list size: " + quakeList.size());
+
+		matchQuakes = getQuakeMatches(this, quakeList);
+		if (matchQuakes == null) {
+			Log.d("quakealert", "no matches");
+			return;
+		}
+
+		int mqsSize = matchQuakes.size();
+		Log.d("quakealert", mqsSize + " matches");
+
+		Collections.sort(matchQuakes, new Quake.ListComparator());
+
+		if (newCount > 0 && quakePrefs.isNotificationsEnabled()) {
+			QuakeNotifier quakeNotifier = new QuakeNotifier(this);
+			quakeNotifier.alert();
+		}
+
+		sendBroadcast(new Intent("updateList"));
 	}
 
 	public RefreshService() {
@@ -84,7 +79,7 @@ public class RefreshService extends IntentService {
 		if (quakePrefs.isUseLocation()) {
 			LocationManager lm = (LocationManager) context
 					.getSystemService(Context.LOCATION_SERVICE);
-			
+
 			location = null;
 			for (String providerName : lm.getProviders(true)) {
 				location = lm.getLastKnownLocation(providerName);
@@ -92,9 +87,11 @@ public class RefreshService extends IntentService {
 					return;
 				}
 			}
-			
+
 			Log.w("quakealert", "could to find location");
 			return;
+		} else {
+			location = null;
 		}
 	}
 
@@ -125,5 +122,12 @@ public class RefreshService extends IntentService {
 		}
 
 		return matchQuakes;
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		sendBroadcast(new Intent("dismissRefreshDialog"));
+		Lock.release();
 	}
 }

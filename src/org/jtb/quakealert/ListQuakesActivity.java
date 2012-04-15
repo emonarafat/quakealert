@@ -7,16 +7,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -29,7 +25,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout;
@@ -51,7 +46,6 @@ public class ListQuakesActivity extends Activity {
 	private static final int PREFS_REQUEST = 0;
 
 	static final int REFRESH_DIALOG = 0;
-	static final int UNKNOWN_LOCATION_DIALOG = 1;
 	static final int NETWORK_ERROR_DIALOG = 2;
 	static final int WARN_DIALOG = 3;
 
@@ -263,6 +257,9 @@ public class ListQuakesActivity extends Activity {
 				finish();
 				startActivity(new Intent(this, getClass()));
 				break;
+			case PrefsActivity.UPDATE_RESULT:
+				updateList();
+				break;
 			}
 		}
 	}
@@ -274,7 +271,13 @@ public class ListQuakesActivity extends Activity {
 				mRefreshDialog = new ProgressDialog(this);
 				mRefreshDialog.setMessage("Refreshing, please wait ...");
 				mRefreshDialog.setIndeterminate(true);
-				mRefreshDialog.setCancelable(false);
+				mRefreshDialog.setCancelable(true);
+				mRefreshDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+					
+					public void onCancel(DialogInterface dialog) {
+						finish();
+					}
+				});
 			}
 			return mRefreshDialog;
 		case NETWORK_ERROR_DIALOG:
@@ -287,6 +290,7 @@ public class ListQuakesActivity extends Activity {
 							public void onClick(DialogInterface dialog,
 									int which) {
 								dismissDialog(NETWORK_ERROR_DIALOG);
+								finish();
 							}
 						});
 				mNetworkErrorDialog = builder.create();

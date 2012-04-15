@@ -18,6 +18,7 @@ public class PrefsActivity extends PreferenceActivity implements
 	static final int CHANGED_RESULT = 1;
 	static final int UNCHANGED_RESULT = 0;
 	static final int RESET_RESULT = 2;
+	static final int UPDATE_RESULT = 3;
 
 	private PrefsActivity mThis;
 	private ListPreference mRangePreference;
@@ -190,7 +191,7 @@ public class PrefsActivity extends PreferenceActivity implements
 			setUnitsTitle();
 			setRangeEntries();
 			setRangeTitle();
-			sendBroadcast(new Intent("updateList"));
+			setResult(UPDATE_RESULT);
 		} else if (key.equals("notificationsEnabled")) {
 			if (mQuakePrefs.isNotificationsEnabled()) {
 				setNotificationsEnabled(true);
