@@ -1,0 +1,1 @@
+Quake Alert is an Android application for monitoring earthquakes.
